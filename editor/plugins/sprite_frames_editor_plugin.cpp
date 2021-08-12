@@ -246,9 +246,6 @@ void SpriteFramesEditor::_notification(int p_what) {
 			remove_anim->set_icon(get_icon("Remove", "EditorIcons"));
 			toggle_anim_search_box->set_icon(get_icon("Search", "EditorIcons"));
 			anim_search_box->set_clear_button_enabled(true);
-			split_sheet_zoom_out->set_icon(get_icon("ZoomLess", "EditorIcons"));
-			split_sheet_zoom_reset->set_icon(get_icon("ZoomReset", "EditorIcons"));
-			split_sheet_zoom_in->set_icon(get_icon("ZoomMore", "EditorIcons"));
 			FALLTHROUGH;
 		}
 		case NOTIFICATION_THEME_CHANGED: {
