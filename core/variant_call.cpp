@@ -1229,6 +1229,10 @@ Variant Variant::construct(const Variant::Type p_type, const Variant **p_args, i
 	} else if (p_argcount == 1 && (!p_strict || Variant::can_convert(p_args[0]->type, p_type))) {
 		//near match construct
 
+		// nil should be passed to any type as nil
+		if (p_args[0]->type == NIL)
+			return Variant();
+
 		switch (p_type) {
 			case NIL: {
 

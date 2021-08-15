@@ -6232,6 +6232,10 @@ bool GDScriptParser::_is_type_compatible(const DataType &p_container, const Data
 	if (!p_container.has_type || !p_expression.has_type) {
 		return true;
 	}
+	// Nil can be assigned to any type
+	if (p_expression.builtin_type == Variant::NIL) {
+		return true;
+	}
 
 	// Should never get here unresolved
 	ERR_FAIL_COND_V(p_container.kind == DataType::UNRESOLVED, false);
