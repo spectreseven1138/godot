@@ -685,8 +685,8 @@ Area2D::Area2D() :
 	priority = 0;
 	monitoring = false;
 	monitorable = false;
-	collision_mask = 1;
-	collision_layer = 1;
+	collision_mask = 0;
+	collision_layer = 0;
 	audio_bus_override = false;
 	set_monitoring(true);
 	set_monitorable(true);

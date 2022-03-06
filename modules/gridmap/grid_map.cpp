@@ -1107,8 +1107,8 @@ RID GridMap::get_bake_mesh_instance(int p_idx) {
 
 GridMap::GridMap() {
 
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 
 	cell_size = Vector3(2, 2, 2);
 	octant_size = 8;

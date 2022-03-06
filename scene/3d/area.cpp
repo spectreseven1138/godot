@@ -735,8 +735,8 @@ Area::Area() :
 	priority = 0;
 	monitoring = false;
 	monitorable = false;
-	collision_mask = 1;
-	collision_layer = 1;
+	collision_mask = 0;
+	collision_layer = 0;
 	set_monitoring(true);
 	set_monitorable(true);
 

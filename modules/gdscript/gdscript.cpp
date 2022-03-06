@@ -164,6 +164,8 @@ Variant GDScript::_new(const Variant **p_args, int p_argcount, Variant::CallErro
 		return Variant();
 	}
 
+	owner->notification(Object::NOTIFICATION_CREATED_USING_NEW);
+
 	if (ref.is_valid()) {
 		return ref;
 	} else {

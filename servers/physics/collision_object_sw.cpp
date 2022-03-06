@@ -231,7 +231,7 @@ CollisionObjectSW::CollisionObjectSW(Type p_type) :
 	type = p_type;
 	space = NULL;
 	instance_id = 0;
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 	ray_pickable = true;
 }

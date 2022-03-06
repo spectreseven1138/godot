@@ -646,8 +646,8 @@ CSGShape::CSGShape() {
 	dirty = false;
 	snap = 0.001;
 	use_collision = false;
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 	calculate_tangents = true;
 	set_notify_local_transform(true);
 }

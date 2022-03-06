@@ -1963,8 +1963,8 @@ TileMap::TileMap() {
 	quadrant_size = 16;
 	cell_size = Size2(64, 64);
 	custom_transform = Transform2D(64, 0, 0, 64, 0, 0);
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 	friction = 1;
 	bounce = 0;
 	mode = MODE_SQUARE;

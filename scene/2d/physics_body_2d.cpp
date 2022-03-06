@@ -134,8 +134,8 @@ PhysicsBody2D::PhysicsBody2D(Physics2DServer::BodyMode p_mode) :
 		CollisionObject2D(Physics2DServer::get_singleton()->body_create(), false) {
 
 	Physics2DServer::get_singleton()->body_set_mode(get_rid(), p_mode);
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 	set_pickable(false);
 }
 

@@ -175,8 +175,8 @@ void PhysicsBody::_bind_methods() {
 PhysicsBody::PhysicsBody(PhysicsServer::BodyMode p_mode) :
 		CollisionObject(PhysicsServer::get_singleton()->body_create(p_mode), false) {
 
-	collision_layer = 1;
-	collision_mask = 1;
+	collision_layer = 0;
+	collision_mask = 0;
 }
 
 #ifndef DISABLE_DEPRECATED
