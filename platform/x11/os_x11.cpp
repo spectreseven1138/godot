@@ -197,7 +197,7 @@ Error OS_X11::initialize(const VideoMode &p_desired, int p_video_driver, int p_a
 	xim = XOpenIM(x11_display, NULL, NULL, NULL);
 
 	if (xim == NULL) {
-		WARN_PRINT("XOpenIM failed");
+		// WARN_PRINT("XOpenIM failed");
 		xim_style = 0L;
 	} else {
 		::XIMCallback im_destroy_callback;
@@ -505,7 +505,7 @@ Error OS_X11::initialize(const VideoMode &p_desired, int p_video_driver, int p_a
 	} else {
 
 		xic = NULL;
-		WARN_PRINT("XCreateIC couldn't create xic");
+		// WARN_PRINT("XCreateIC couldn't create xic");
 	}
 
 	cursor_size = XcursorGetDefaultSize(x11_display);
