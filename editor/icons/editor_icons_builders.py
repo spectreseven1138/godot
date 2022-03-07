@@ -17,6 +17,9 @@ def make_editor_icons_action(target, source, env):
 
     for f in svg_icons:
 
+        if f.startswith("."):
+            continue
+
         fname = str(f)
 
         icons_string.write('\t"')

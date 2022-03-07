@@ -356,6 +356,7 @@ String GDScriptSyntaxHighlighter::get_name() const {
 List<String> GDScriptSyntaxHighlighter::get_supported_languages() {
 	List<String> languages;
 	languages.push_back("GDScript");
+	languages.push_back("GDHeader");
 	return languages;
 }
 

@@ -1057,6 +1057,7 @@ ProjectSettings::ProjectSettings() {
 
 	PoolStringArray extensions = PoolStringArray();
 	extensions.push_back("gd");
+	extensions.push_back("gdh");
 	if (Engine::get_singleton()->has_singleton("GodotSharp"))
 		extensions.push_back("cs");
 	extensions.push_back("shader");

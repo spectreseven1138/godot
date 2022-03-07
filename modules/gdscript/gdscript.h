@@ -274,6 +274,10 @@ public:
 	~GDScriptInstance();
 };
 
+class GDHeader: public GDScript {
+	GDCLASS(GDHeader, GDScript);
+};
+
 #ifdef DEBUG_ENABLED
 struct GDScriptWarning {
 	enum Code {

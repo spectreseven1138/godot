@@ -215,7 +215,7 @@ String ScriptCreateDialog::_validate_path(const String &p_path, bool p_file_must
 	}
 
 	if (!found) return TTR("Invalid extension.");
-	if (!match) return TTR("Wrong extension chosen.");
+	// if (!match) return TTR("Wrong extension chosen.");
 
 	/* Let ScriptLanguage do custom validation */
 	String path_error = ScriptServer::get_language(language_menu->get_selected())->validate_path(p);

@@ -1854,7 +1854,7 @@ void GDScriptLanguage::get_reserved_words(List<String> *p_words) const {
 
 bool GDScriptLanguage::handles_global_class_type(const String &p_type) const {
 
-	return p_type == "GDScript";
+	return p_type == "GDScript" || p_type == "GDHeader";
 }
 
 String GDScriptLanguage::get_global_class_name(const String &p_path, String *r_base_type, String *r_icon_path) const {
@@ -2256,11 +2256,12 @@ void ResourceFormatLoaderGDScript::get_recognized_extensions(List<String> *p_ext
 	p_extensions->push_back("gd");
 	p_extensions->push_back("gdc");
 	p_extensions->push_back("gde");
+	p_extensions->push_back("gdh");
 }
 
 bool ResourceFormatLoaderGDScript::handles_type(const String &p_type) const {
 
-	return (p_type == "Script" || p_type == "GDScript");
+	return (p_type == "Script" || p_type == "GDScript" || p_type == "GDHeader");
 }
 
 String ResourceFormatLoaderGDScript::get_resource_type(const String &p_path) const {
@@ -2268,6 +2269,8 @@ String ResourceFormatLoaderGDScript::get_resource_type(const String &p_path) con
 	String el = p_path.get_extension().to_lower();
 	if (el == "gd" || el == "gdc" || el == "gde")
 		return "GDScript";
+	else if (el == "gdh")
+		return "GDHeader";
 	return "";
 }
 
@@ -2322,6 +2325,7 @@ void ResourceFormatSaverGDScript::get_recognized_extensions(const RES &p_resourc
 
 	if (Object::cast_to<GDScript>(*p_resource)) {
 		p_extensions->push_back("gd");
+		p_extensions->push_back("gdh");
 	}
 }
 bool ResourceFormatSaverGDScript::recognize(const RES &p_resource) const {
