@@ -120,6 +120,10 @@ void Area2D::_body_enter_tree(ObjectID p_id) {
 	Node *node = Object::cast_to<Node>(obj);
 	ERR_FAIL_COND(!node);
 
+	if (has_detection_exception_with(node)) {
+		return;
+	}
+
 	Map<ObjectID, BodyState>::Element *E = body_map.find(p_id);
 	ERR_FAIL_COND(!E);
 	ERR_FAIL_COND(E->get().in_tree);
@@ -164,6 +168,8 @@ void Area2D::_body_inout(int p_status, const RID &p_body, int p_instance, int p_
 
 	locked = true;
 
+	bool detection_excepted = has_detection_exception_with(node);
+
 	if (body_in) {
 		if (!E) {
 
@@ -173,7 +179,7 @@ void Area2D::_body_inout(int p_status, const RID &p_body, int p_instance, int p_
 			if (node) {
 				node->connect(SceneStringNames::get_singleton()->tree_entered, this, SceneStringNames::get_singleton()->_body_enter_tree, make_binds(objid));
 				node->connect(SceneStringNames::get_singleton()->tree_exiting, this, SceneStringNames::get_singleton()->_body_exit_tree, make_binds(objid));
-				if (E->get().in_tree) {
+				if (E->get().in_tree && !detection_excepted) {
 					emit_signal(SceneStringNames::get_singleton()->body_entered, node);
 				}
 			}
@@ -182,7 +188,7 @@ void Area2D::_body_inout(int p_status, const RID &p_body, int p_instance, int p_
 		if (node)
 			E->get().shapes.insert(ShapePair(p_body_shape, p_area_shape));
 
-		if (!node || E->get().in_tree) {
+		if ((!node || E->get().in_tree) && !detection_excepted) {
 			emit_signal(SceneStringNames::get_singleton()->body_shape_entered, objid, node, p_body_shape, p_area_shape);
 		}
 
@@ -199,11 +205,11 @@ void Area2D::_body_inout(int p_status, const RID &p_body, int p_instance, int p_
 			if (node) {
 				node->disconnect(SceneStringNames::get_singleton()->tree_entered, this, SceneStringNames::get_singleton()->_body_enter_tree);
 				node->disconnect(SceneStringNames::get_singleton()->tree_exiting, this, SceneStringNames::get_singleton()->_body_exit_tree);
-				if (in_tree)
+				if (in_tree && !detection_excepted)
 					emit_signal(SceneStringNames::get_singleton()->body_exited, obj);
 			}
 		}
-		if (!node || in_tree) {
+		if ((!node || in_tree) && !detection_excepted) {
 			emit_signal(SceneStringNames::get_singleton()->body_shape_exited, objid, obj, p_body_shape, p_area_shape);
 		}
 	}
@@ -216,6 +222,10 @@ void Area2D::_area_enter_tree(ObjectID p_id) {
 	Object *obj = ObjectDB::get_instance(p_id);
 	Node *node = Object::cast_to<Node>(obj);
 	ERR_FAIL_COND(!node);
+
+	if (has_detection_exception_with(node)) {
+		return;
+	}
 
 	Map<ObjectID, AreaState>::Element *E = area_map.find(p_id);
 	ERR_FAIL_COND(!E);
@@ -260,6 +270,8 @@ void Area2D::_area_inout(int p_status, const RID &p_area, int p_instance, int p_
 	}
 	locked = true;
 
+	bool detection_excepted = has_detection_exception_with(node);
+
 	if (area_in) {
 		if (!E) {
 
@@ -269,7 +281,7 @@ void Area2D::_area_inout(int p_status, const RID &p_area, int p_instance, int p_
 			if (node) {
 				node->connect(SceneStringNames::get_singleton()->tree_entered, this, SceneStringNames::get_singleton()->_area_enter_tree, make_binds(objid));
 				node->connect(SceneStringNames::get_singleton()->tree_exiting, this, SceneStringNames::get_singleton()->_area_exit_tree, make_binds(objid));
-				if (E->get().in_tree) {
+				if (E->get().in_tree && !detection_excepted) {
 					emit_signal(SceneStringNames::get_singleton()->area_entered, node);
 				}
 			}
@@ -278,7 +290,7 @@ void Area2D::_area_inout(int p_status, const RID &p_area, int p_instance, int p_
 		if (node)
 			E->get().shapes.insert(AreaShapePair(p_area_shape, p_self_shape));
 
-		if (!node || E->get().in_tree) {
+		if ((!node || E->get().in_tree) && !detection_excepted) {
 			emit_signal(SceneStringNames::get_singleton()->area_shape_entered, objid, node, p_area_shape, p_self_shape);
 		}
 
@@ -295,11 +307,11 @@ void Area2D::_area_inout(int p_status, const RID &p_area, int p_instance, int p_
 			if (node) {
 				node->disconnect(SceneStringNames::get_singleton()->tree_entered, this, SceneStringNames::get_singleton()->_area_enter_tree);
 				node->disconnect(SceneStringNames::get_singleton()->tree_exiting, this, SceneStringNames::get_singleton()->_area_exit_tree);
-				if (in_tree)
+				if (in_tree && !detection_excepted)
 					emit_signal(SceneStringNames::get_singleton()->area_exited, obj);
 			}
 		}
-		if (!node || in_tree) {
+		if ((!node || in_tree) && !detection_excepted) {
 			emit_signal(SceneStringNames::get_singleton()->area_shape_exited, objid, obj, p_area_shape, p_self_shape);
 		}
 	}
@@ -424,7 +436,7 @@ bool Area2D::is_monitorable() const {
 	return monitorable;
 }
 
-Array Area2D::get_overlapping_bodies() const {
+Array Area2D::get_overlapping_bodies() {
 
 	ERR_FAIL_COND_V_MSG(!monitoring, Array(), "Can't find overlapping bodies when monitoring is off.");
 	Array ret;
@@ -432,7 +444,7 @@ Array Area2D::get_overlapping_bodies() const {
 	int idx = 0;
 	for (const Map<ObjectID, BodyState>::Element *E = body_map.front(); E; E = E->next()) {
 		Object *obj = ObjectDB::get_instance(E->key());
-		if (!obj) {
+		if (!obj || has_detection_exception_with(Object::cast_to<Node>(obj))) {
 			ret.resize(ret.size() - 1); //ops
 		} else {
 			ret[idx++] = obj;
@@ -442,7 +454,7 @@ Array Area2D::get_overlapping_bodies() const {
 	return ret;
 }
 
-Array Area2D::get_overlapping_areas() const {
+Array Area2D::get_overlapping_areas() {
 
 	ERR_FAIL_COND_V_MSG(!monitoring, Array(), "Can't find overlapping bodies when monitoring is off.");
 	Array ret;
@@ -450,7 +462,7 @@ Array Area2D::get_overlapping_areas() const {
 	int idx = 0;
 	for (const Map<ObjectID, AreaState>::Element *E = area_map.front(); E; E = E->next()) {
 		Object *obj = ObjectDB::get_instance(E->key());
-		if (!obj) {
+		if (!obj || has_detection_exception_with(Object::cast_to<Node>(obj))) {
 			ret.resize(ret.size() - 1); //ops
 		} else {
 			ret[idx++] = obj;
@@ -460,22 +472,69 @@ Array Area2D::get_overlapping_areas() const {
 	return ret;
 }
 
-bool Area2D::overlaps_area(Node *p_area) const {
+bool Area2D::overlaps_area(Node *p_area) {
 
 	ERR_FAIL_NULL_V(p_area, false);
+
+	if (has_detection_exception_with(p_area)) {
+		return false;
+	}
+
 	const Map<ObjectID, AreaState>::Element *E = area_map.find(p_area->get_instance_id());
 	if (!E)
 		return false;
 	return E->get().in_tree;
 }
 
-bool Area2D::overlaps_body(Node *p_body) const {
+bool Area2D::overlaps_body(Node *p_body) {
 
 	ERR_FAIL_NULL_V(p_body, false);
+
+	if (has_detection_exception_with(p_body)) {
+		return false;
+	}
+
 	const Map<ObjectID, BodyState>::Element *E = body_map.find(p_body->get_instance_id());
 	if (!E)
 		return false;
 	return E->get().in_tree;
+}
+
+void Area2D::add_detection_exception_with(Node *p_node) {
+
+	ERR_FAIL_NULL(p_node);
+	CollisionObject2D *collision_object = Object::cast_to<CollisionObject2D>(p_node);
+	ERR_FAIL_COND_MSG(!collision_object, "Collision exceptions can only be added for CollisionObject2D.");
+
+	if (detection_exceptions.find(collision_object->get_instance_id()) == NULL) {
+		detection_exceptions.push_back(collision_object->get_instance_id());
+	}
+}
+
+void Area2D::remove_detection_exception_with(Node *p_node) {
+
+	ERR_FAIL_NULL(p_node);
+	CollisionObject2D *collision_object = Object::cast_to<CollisionObject2D>(p_node);
+	ERR_FAIL_COND_MSG(!collision_object, "Collision exceptions can only be added for CollisionObject2D.");
+
+	detection_exceptions.erase(collision_object->get_instance_id());
+}
+
+bool Area2D::has_detection_exception_with(Node *p_node) {
+
+	ERR_FAIL_NULL_V(p_node, false);
+	CollisionObject2D *collision_object = Object::cast_to<CollisionObject2D>(p_node);
+	ERR_FAIL_COND_V_MSG(!collision_object, false, "Collision exceptions can only be added for CollisionObject2D.");
+
+	return detection_exceptions.find(collision_object->get_instance_id()) != NULL;
+}
+
+Array Area2D::get_detection_exceptions() {
+	Array ret;
+	for (List<ObjectID>::Element *E = detection_exceptions.front(); E; E = E->next()) {
+		ret.append(ObjectDB::get_instance(E->get()));
+	}
+	return ret;
 }
 
 void Area2D::set_collision_mask(uint32_t p_mask) {
@@ -626,6 +685,11 @@ void Area2D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("overlaps_body", "body"), &Area2D::overlaps_body);
 	ClassDB::bind_method(D_METHOD("overlaps_area", "area"), &Area2D::overlaps_area);
+
+	ClassDB::bind_method(D_METHOD("add_detection_exception_with", "node"), &Area2D::add_detection_exception_with);
+	ClassDB::bind_method(D_METHOD("remove_detection_exception_with", "node"), &Area2D::remove_detection_exception_with);
+	ClassDB::bind_method(D_METHOD("has_detection_exception_with", "node"), &Area2D::has_detection_exception_with);
+	ClassDB::bind_method(D_METHOD("get_detection_exceptions"), &Area2D::get_detection_exceptions);
 
 	ClassDB::bind_method(D_METHOD("set_audio_bus_name", "name"), &Area2D::set_audio_bus_name);
 	ClassDB::bind_method(D_METHOD("get_audio_bus_name"), &Area2D::get_audio_bus_name);

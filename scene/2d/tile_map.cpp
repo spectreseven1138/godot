@@ -1139,6 +1139,23 @@ Vector2 TileMap::get_cell_autotile_coord(int p_x, int p_y) const {
 	return Vector2(E->get().autotile_coord_x, E->get().autotile_coord_y);
 }
 
+Vector2 TileMap::get_cellv_autotile_coord(const Vector2 &p_pos) const {
+
+	return get_cell_autotile_coord(p_pos.x, p_pos.y);
+}
+
+bool TileMap::is_cell_autotile(int p_x, int p_y) const {
+	
+	PosKey pk(p_x, p_y);
+	
+	return tile_map.find(pk);
+}
+
+bool TileMap::is_cellv_autotile(const Vector2 &p_pos) const {
+
+	return is_cell_autotile(p_pos.x, p_pos.y);
+}
+
 void TileMap::_recreate_quadrants() {
 
 	_clear_quadrants();
@@ -1880,6 +1897,9 @@ void TileMap::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_cell_transposed", "x", "y"), &TileMap::is_cell_transposed);
 
 	ClassDB::bind_method(D_METHOD("get_cell_autotile_coord", "x", "y"), &TileMap::get_cell_autotile_coord);
+	ClassDB::bind_method(D_METHOD("get_cellv_autotile_coord", "position"), &TileMap::get_cellv_autotile_coord);
+	ClassDB::bind_method(D_METHOD("is_cell_autotile", "x", "y"), &TileMap::is_cell_autotile);
+	ClassDB::bind_method(D_METHOD("is_cellv_autotile", "position"), &TileMap::is_cellv_autotile);
 
 	ClassDB::bind_method(D_METHOD("fix_invalid_tiles"), &TileMap::fix_invalid_tiles);
 	ClassDB::bind_method(D_METHOD("clear"), &TileMap::clear);

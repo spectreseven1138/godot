@@ -265,6 +265,9 @@ public:
 	bool is_cell_transposed(int p_x, int p_y) const;
 	void set_cell_autotile_coord(int p_x, int p_y, const Vector2 &p_coord);
 	Vector2 get_cell_autotile_coord(int p_x, int p_y) const;
+	Vector2 get_cellv_autotile_coord(const Vector2 &p_pos) const;
+	bool is_cell_autotile(int p_x, int p_y) const;
+	bool is_cellv_autotile(const Vector2 &p_pos) const;
 
 	void _set_celld(const Vector2 &p_pos, const Dictionary &p_data);
 	void set_cellv(const Vector2 &p_pos, int p_tile, bool p_flip_x = false, bool p_flip_y = false, bool p_transpose = false);

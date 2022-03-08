@@ -53,6 +53,35 @@
 				Returns the coordinate (subtile column and row) of the autotile variation in the tileset. Returns a zero vector if the cell doesn't have autotiling.
 			</description>
 		</method>
+		<method name="get_cellv_autotile_coord" qualifiers="const">
+			<return type="Vector2">
+			</return>
+			<argument index="0" name="position" type="Vector2">
+			</argument>
+			<description>
+				Returns the coordinate (subtile column and row) of the autotile variation in the tileset by a given Vector2. Returns a zero vector if the cell doesn't have autotiling.
+			</description>
+		</method>
+		<method name="is_cell_autotile" qualifiers="const">
+			<return type="bool">
+			</return>
+			<argument index="0" name="x" type="int">
+			</argument>
+			<argument index="1" name="y" type="int">
+			</argument>
+			<description>
+				Returns [code]true[/code] if the given cell has autotiling.
+			</description>
+		</method>
+		<method name="is_cellv_autotile" qualifiers="const">
+			<return type="bool">
+			</return>
+			<argument index="0" name="position" type="Vector2">
+			</argument>
+			<description>
+				Returns [code]true[/code] if the cell given by Vector2 has autotiling.
+			</description>
+		</method>
 		<method name="get_cellv" qualifiers="const">
 			<return type="int">
 			</return>

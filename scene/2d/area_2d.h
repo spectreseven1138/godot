@@ -130,6 +130,8 @@ private:
 	bool audio_bus_override;
 	StringName audio_bus;
 
+	List<ObjectID> detection_exceptions;
+
 protected:
 	void _notification(int p_what);
 	static void _bind_methods();
@@ -178,11 +180,16 @@ public:
 	void set_collision_layer_bit(int p_bit, bool p_value);
 	bool get_collision_layer_bit(int p_bit) const;
 
-	Array get_overlapping_bodies() const; //function for script
-	Array get_overlapping_areas() const; //function for script
+	Array get_overlapping_bodies(); //function for script
+	Array get_overlapping_areas(); //function for script
 
-	bool overlaps_area(Node *p_area) const;
-	bool overlaps_body(Node *p_body) const;
+	bool overlaps_area(Node *p_area);
+	bool overlaps_body(Node *p_body);
+
+	void add_detection_exception_with(Node *p_node);
+	void remove_detection_exception_with(Node *p_node);
+	bool has_detection_exception_with(Node *p_node);
+	Array get_detection_exceptions();
 
 	void set_audio_bus_override(bool p_override);
 	bool is_overriding_audio_bus() const;
