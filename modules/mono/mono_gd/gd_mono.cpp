@@ -491,7 +491,7 @@ void GDMono::_register_internal_calls() {
 void GDMono::_init_godot_api_hashes() {
 #if defined(MONO_GLUE_ENABLED) && defined(DEBUG_METHODS_ENABLED)
 	if (get_api_core_hash() != GodotSharpBindings::get_core_api_hash()) {
-		ERR_PRINT("Mono: Core API hash mismatch.");
+		// ERR_PRINT("Mono: Core API hash mismatch.");
 	}
 
 #ifdef TOOLS_ENABLED
