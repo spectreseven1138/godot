@@ -66,40 +66,6 @@
 				The [code]body[/code] argument can either be a [PhysicsBody2D] or a [TileMap] instance (while TileMaps are not physics body themselves, they register their tiles with collision shapes as a virtual physics body).
 			</description>
 		</method>
-		<method name="add_detection_exception_with">
-			<return type="void">
-			</return>
-			<argument index="0" name="node" type="Node">
-			</argument>
-			<description>
-				Adds a node to the list of nodes that this area can't detect.
-			</description>
-		</method>
-		<method name="remove_detection_exception_with">
-			<return type="void">
-			</return>
-			<argument index="0" name="node" type="Node">
-			</argument>
-			<description>
-				Removes a node from the list of nodes that this area can't detect.
-			</description>
-		</method>
-		<method name="has_detection_exception_with">
-			<return type="void">
-			</return>
-			<argument index="0" name="node" type="Node">
-			</argument>
-			<description>
-				Returns [code]true[/code] if the passed node is in the list of nodes that this area can't detect.
-			</description>
-		</method>
-		<method name="get_detection_exceptions">
-			<return type="Array">
-			</return>
-			<description>
-				Returns an array of nodes that were added as detection exceptions for this area.
-			</description>
-		</method>
 		<method name="set_collision_layer_bit">
 			<return type="void">
 			</return>

@@ -29,21 +29,21 @@
 				Returns an individual bit on the collision mask.
 			</description>
 		</method>
-		<method name="get_overlapping_areas">
+		<method name="get_overlapping_areas" qualifiers="const">
 			<return type="Array">
 			</return>
 			<description>
 				Returns a list of intersecting [Area]s. For performance reasons (collisions are all processed at the same time) this list is modified once during the physics step, not immediately after objects are moved. Consider using signals instead.
 			</description>
 		</method>
-		<method name="get_overlapping_bodies">
+		<method name="get_overlapping_bodies" qualifiers="const">
 			<return type="Array">
 			</return>
 			<description>
 				Returns a list of intersecting [PhysicsBody]s. For performance reasons (collisions are all processed at the same time) this list is modified once during the physics step, not immediately after objects are moved. Consider using signals instead.
 			</description>
 		</method>
-		<method name="overlaps_area">
+		<method name="overlaps_area" qualifiers="const">
 			<return type="bool">
 			</return>
 			<argument index="0" name="area" type="Node">
@@ -53,7 +53,7 @@
 				[b]Note:[/b] The result of this test is not immediate after moving objects. For performance, list of overlaps is updated once per frame and before the physics step. Consider using signals instead.
 			</description>
 		</method>
-		<method name="overlaps_body">
+		<method name="overlaps_body" qualifiers="const">
 			<return type="bool">
 			</return>
 			<argument index="0" name="body" type="Node">
