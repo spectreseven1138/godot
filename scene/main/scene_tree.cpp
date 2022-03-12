@@ -477,7 +477,7 @@ bool SceneTree::iteration(float p_time) {
 	MainLoop::iteration(p_time);
 	physics_process_time = p_time;
 
-	emit_signal("physics_frame");
+	emit_signal("physics_frame", p_time);
 
 	_notify_group_pause("physics_process_internal", Node::NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
 	if (GLOBAL_GET("physics/common/enable_pause_aware_picking")) {
@@ -520,7 +520,7 @@ bool SceneTree::idle(float p_time) {
 		multiplayer->poll();
 	}
 
-	emit_signal("idle_frame");
+	emit_signal("idle_frame", p_time);
 
 	MessageQueue::get_singleton()->flush(); //small little hack
 
@@ -1936,8 +1936,8 @@ void SceneTree::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("screen_resized"));
 	ADD_SIGNAL(MethodInfo("node_configuration_warning_changed", PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node")));
 
-	ADD_SIGNAL(MethodInfo("idle_frame"));
-	ADD_SIGNAL(MethodInfo("physics_frame"));
+	ADD_SIGNAL(MethodInfo("idle_frame", PropertyInfo(Variant::REAL, "delta")));
+	ADD_SIGNAL(MethodInfo("physics_frame", PropertyInfo(Variant::REAL, "delta")));
 
 	ADD_SIGNAL(MethodInfo("files_dropped", PropertyInfo(Variant::POOL_STRING_ARRAY, "files"), PropertyInfo(Variant::INT, "screen")));
 	ADD_SIGNAL(MethodInfo("global_menu_action",

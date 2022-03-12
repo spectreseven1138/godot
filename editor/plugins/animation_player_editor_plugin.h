@@ -212,6 +212,7 @@ class AnimationPlayerEditor : public VBoxContainer {
 	void _prepare_onion_layers_1();
 	void _prepare_onion_layers_2();
 	void _start_onion_skinning();
+	void _call_prepare_onion_layers_1(int _p_delta);
 	void _stop_onion_skinning();
 
 	void _pin_pressed();

@@ -345,6 +345,8 @@
 			</description>
 		</signal>
 		<signal name="idle_frame">
+			<argument index="0" name="delta" type="float">
+			</argument>
 			<description>
 				Emitted immediately before [method Node._process] is called on every node in the [SceneTree].
 			</description>
@@ -392,6 +394,8 @@
 			</description>
 		</signal>
 		<signal name="physics_frame">
+			<argument index="0" name="delta" type="float">
+			</argument>
 			<description>
 				Emitted immediately before [method Node._physics_process] is called on every node in the [SceneTree].
 			</description>
