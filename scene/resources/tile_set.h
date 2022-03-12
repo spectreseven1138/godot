@@ -108,6 +108,22 @@ public:
 				size(64, 64),
 				spacing(0),
 				icon_coord(0, 0) {}
+		
+		AutotileData duplicate() {
+			AutotileData ret = AutotileData();
+			ret.bitmask_mode = bitmask_mode;
+			ret.size = size;
+			ret.spacing = spacing;
+			ret.icon_coord = icon_coord;
+			ret.flags = flags;
+			ret.occluder_map = occluder_map;
+			ret.navpoly_map = navpoly_map;
+			ret.priority_map = priority_map;
+			ret.z_index_map = z_index_map;
+
+			return ret;
+		}
+
 	};
 
 private:
@@ -134,6 +150,27 @@ private:
 				tile_mode(SINGLE_TILE),
 				modulate(1, 1, 1),
 				z_index(0) {}
+		
+		TileData duplicate() {
+			TileData ret = TileData();
+			ret.name = name;
+			ret.texture = texture;
+			ret.normal_map = normal_map;
+			ret.offset = offset;
+			ret.region = region;
+			ret.shapes_data = shapes_data;
+			ret.occluder_offset = occluder_offset;
+			ret.occluder = occluder;
+			ret.navigation_polygon_offset = navigation_polygon_offset;
+			ret.navigation_polygon = navigation_polygon;
+			ret.material = material;
+			ret.tile_mode = tile_mode;
+			ret.autotile_data = autotile_data.duplicate();
+			ret.z_index = z_index;
+			
+			return ret;
+		}
+
 	};
 
 	Map<int, TileData> tile_map;
@@ -151,6 +188,7 @@ protected:
 
 public:
 	void create_tile(int p_id);
+	void duplicate_tile(int p_base_id, int p_new_id);
 
 	void autotile_set_bitmask_mode(int p_id, BitmaskMode p_mode);
 	BitmaskMode autotile_get_bitmask_mode(int p_id) const;

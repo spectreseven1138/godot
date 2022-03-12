@@ -286,6 +286,17 @@
 				Creates a new tile with the given ID.
 			</description>
 		</method>
+		<method name="duplicate_tile">
+			<return type="void">
+			</return>
+			<argument index="0" name="base_id" type="int">
+			</argument>
+			<argument index="1" name="new_id" type="int">
+			</argument>
+			<description>
+				Duplicates the tile with the given base ID and stores it with the given new ID.
+			</description>
+		</method>
 		<method name="find_tile_by_name" qualifiers="const">
 			<return type="int">
 			</return>

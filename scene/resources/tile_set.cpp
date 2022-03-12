@@ -374,6 +374,14 @@ void TileSet::create_tile(int p_id) {
 	emit_changed();
 }
 
+void TileSet::duplicate_tile(int p_base_id, int p_new_id) {
+	ERR_FAIL_COND_MSG(!tile_map.has(p_base_id), vformat("The TileSet has no tile with ID '%d'.", p_base_id));
+	ERR_FAIL_COND_MSG(tile_map.has(p_new_id), vformat("The TileSet already has a tile with ID '%d'.", p_new_id));
+	tile_map[p_new_id] = tile_map[p_base_id].duplicate();
+	_change_notify("");
+	emit_changed();
+}
+
 void TileSet::autotile_set_bitmask_mode(int p_id, BitmaskMode p_mode) {
 	ERR_FAIL_COND_MSG(!tile_map.has(p_id), vformat("The TileSet doesn't have a tile with ID '%d'.", p_id));
 	tile_map[p_id].autotile_data.bitmask_mode = p_mode;
@@ -1095,6 +1103,7 @@ void TileSet::clear() {
 void TileSet::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("create_tile", "id"), &TileSet::create_tile);
+	ClassDB::bind_method(D_METHOD("duplicate_tile", "base_id", "p_new_id"), &TileSet::duplicate_tile);
 	ClassDB::bind_method(D_METHOD("autotile_clear_bitmask_map", "id"), &TileSet::autotile_clear_bitmask_map);
 	ClassDB::bind_method(D_METHOD("autotile_set_icon_coordinate", "id", "coord"), &TileSet::autotile_set_icon_coordinate);
 	ClassDB::bind_method(D_METHOD("autotile_get_icon_coordinate", "id"), &TileSet::autotile_get_icon_coordinate);
