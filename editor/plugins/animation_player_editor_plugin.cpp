@@ -1569,6 +1569,7 @@ void AnimationPlayerEditor::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_prepare_onion_layers_2"), &AnimationPlayerEditor::_prepare_onion_layers_2);
 	ClassDB::bind_method(D_METHOD("_start_onion_skinning"), &AnimationPlayerEditor::_start_onion_skinning);
 	ClassDB::bind_method(D_METHOD("_stop_onion_skinning"), &AnimationPlayerEditor::_stop_onion_skinning);
+	ClassDB::bind_method(D_METHOD("_call_prepare_onion_layers_1"), &AnimationPlayerEditor::_call_prepare_onion_layers_1);
 
 	ClassDB::bind_method(D_METHOD("_pin_pressed"), &AnimationPlayerEditor::_pin_pressed);
 }
