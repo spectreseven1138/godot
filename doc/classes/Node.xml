@@ -567,6 +567,13 @@
 				[b]Important:[/b] If you have a variable pointing to a node, it will [i]not[/i] be assigned to [code]null[/code] once the node is freed. Instead, it will point to a [i]previously freed instance[/i] and you should validate it with [method @GDScript.is_instance_valid] before attempting to call its methods or access its properties.
 			</description>
 		</method>
+		<method name="is_lineage_queued_for_deletion">
+			<return type="bool">
+			</return>
+			<description>
+				Returns [code]true[/code] if the [method Node.queue_free] method was called for the node or any of its ancestors.
+			</description>
+		</method>
 		<method name="raise">
 			<return type="void">
 			</return>

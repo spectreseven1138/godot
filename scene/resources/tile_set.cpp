@@ -927,7 +927,7 @@ int TileSet::tile_get_z_index(int p_id) const {
 void TileSet::tile_set_z_index(int p_id, int p_z_index) {
 	ERR_FAIL_COND_MSG(!tile_map.has(p_id), vformat("The TileSet doesn't have a tile with ID '%d'.", p_id));
 	tile_map[p_id].z_index = p_z_index;
-	emit_changed();
+	// emit_changed();
 }
 
 void TileSet::_tile_set_shapes(int p_id, const Array &p_shapes) {

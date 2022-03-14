@@ -724,11 +724,9 @@ void GDScriptFunctions::call(Function p_func, const Variant **p_args, int p_arg_
 		} break;
 		case TEXT_PRINT_TABBED: {
 
-			String str;
+			String str = String().num_uint64(OS::get_singleton()->get_ticks_msec()) + ": ";
 			for (int i = 0; i < p_arg_count; i++) {
 
-				if (i)
-					str += "\t";
 				str += p_args[i]->operator String();
 			}
 

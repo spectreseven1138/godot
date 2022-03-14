@@ -2677,6 +2677,21 @@ void Node::queue_delete() {
 	}
 }
 
+bool Node::is_lineage_queued_for_deletion() {
+	if (is_queued_for_deletion()) {
+		return true;
+	}
+	else {
+		Node *parent = get_parent();
+		if (ObjectDB::instance_validate(parent)) {
+			return parent->is_lineage_queued_for_deletion();
+		}
+		else {
+			return false;
+		}
+	}
+}
+
 Array Node::_get_children() const {
 
 	Array arr;
@@ -2862,6 +2877,7 @@ void Node::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_viewport"), &Node::get_viewport);
 
 	ClassDB::bind_method(D_METHOD("queue_free"), &Node::queue_delete);
+	ClassDB::bind_method(D_METHOD("is_lineage_queued_for_deletion"), &Node::is_lineage_queued_for_deletion);
 
 	ClassDB::bind_method(D_METHOD("request_ready"), &Node::request_ready);
 

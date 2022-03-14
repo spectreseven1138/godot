@@ -876,9 +876,9 @@
 			<return type="void">
 			</return>
 			<description>
-				Prints one or more arguments to the console with a tab between each argument.
+				Prints one or more arguments to the console with the game time ([method OS.get_ticks_msec]) prepended and spaces between each argument.
 				[codeblock]
-				printt("A", "B", "C") # Prints A       B       C
+				printt("A", "B", "C") # Prints 3213: A B C
 				[/codeblock]
 			</description>
 		</method>
