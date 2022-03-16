@@ -740,7 +740,7 @@ void GDScriptFunctions::call(Function p_func, const Variant **p_args, int p_arg_
 			for (int i = 0; i < p_arg_count; i++) {
 
 				if (i)
-					str += " ";
+					str += " | ";
 				str += p_args[i]->operator String();
 			}
 

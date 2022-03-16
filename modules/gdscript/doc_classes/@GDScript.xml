@@ -866,9 +866,9 @@
 			<return type="void">
 			</return>
 			<description>
-				Prints one or more arguments to the console with a space between each argument.
+				Prints one or more arguments to the console with a splitter character between each argument.
 				[codeblock]
-				prints("A", "B", "C") # Prints A B C
+				prints("A", "B", "C") # Prints A | B | C
 				[/codeblock]
 			</description>
 		</method>
