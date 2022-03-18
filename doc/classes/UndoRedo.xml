@@ -176,11 +176,46 @@
 				Undo the last action.
 			</description>
 		</method>
+		<method name="get_action">
+			<return type="Dictionary">
+			</return>
+			<argument index="0" name="index" type="int">
+			</argument>
+			<description>
+				Returns a Dictionary containing information about the peformed action at the passed [code]index[/code]. Actions represent actions that the user performs within the editor, and contain information about how the action can be undone/redone.
+				The format of the returned Dictionary is as follows:
+				- [code]name[/code]: Human-readable name of the action
+				- [code]redo_operations[/code]: Array of Dictionaries containing information about the operations needed in order to redo this action.
+				- [code]undo_operations[/code]: Array of Dictionaries containing information about the operations needed in order to undo this action.
+				- [code]time[/code]: The engine time (see [method OS.get_ticks_msec]) when this action was performed.
+			</description>
+		</method>
+		<method name="get_all_actions">
+			<return type="Array">
+			</return>
+			<description>
+				Returns an Array of Dictionaries containing information about the undo/redo actions stored. Refer to [method get_action] for information about actions.
+			</description>
+		</method>
+		<method name="get_current_action">
+			<return type="int">
+			</return>
+			<description>
+				The index of the most recently redone action within the action list. Actions including and before the current action can be undone, and actions after it can be redone. 
+			</description>
+		</method>
+		<method name="get_action_count">
+			<return type="int">
+			</return>
+			<description>
+				The amount of stored actions. Equivalent to the size of [method get_all_actions].
+			</description>
+		</method>
 	</methods>
 	<signals>
 		<signal name="version_changed">
 			<description>
-				Called when [method undo] or [method redo] was called.
+				Emitted when [method undo] and [method redo] are called, as well as when [method clear_history] is called with [code]increase_version[/code] set to [code]true[/code].
 			</description>
 		</signal>
 	</signals>
@@ -193,6 +228,15 @@
 		</constant>
 		<constant name="MERGE_ALL" value="2" enum="MergeMode">
 			Makes subsequent actions with the same name be merged into one.
+		</constant>
+		<constant name="OPERATION_TYPE_METHOD" value="0" enum="OperationType">
+			An operation added with [method add_do_method].
+		</constant>
+		<constant name="OPERATION_TYPE_PROPERTY" value="1" enum="OperationType">
+			An operation added with [method add_do_property].
+		</constant>
+		<constant name="OPERATION_TYPE_REFERENCE" value="2" enum="OperationType">
+			An operation added with [method add_to_reference].
 		</constant>
 	</constants>
 </class>

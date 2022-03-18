@@ -41,7 +41,7 @@ void UndoRedo::_discard_redo() {
 
 		for (List<Operation>::Element *E = actions.write[i].do_ops.front(); E; E = E->next()) {
 
-			if (E->get().type == Operation::TYPE_REFERENCE) {
+			if (E->get().type == OPERATION_TYPE_REFERENCE) {
 
 				Object *obj = ObjectDB::get_instance(E->get().object);
 				if (obj)
@@ -74,7 +74,7 @@ void UndoRedo::create_action(const String &p_name, MergeMode p_mode) {
 
 				while (E) {
 
-					if (E->get().type == Operation::TYPE_REFERENCE) {
+					if (E->get().type == OPERATION_TYPE_REFERENCE) {
 
 						Object *obj = ObjectDB::get_instance(E->get().object);
 
@@ -116,7 +116,7 @@ void UndoRedo::add_do_method(Object *p_object, const String &p_method, VARIANT_A
 	if (Object::cast_to<Resource>(p_object))
 		do_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	do_op.type = Operation::TYPE_METHOD;
+	do_op.type = OPERATION_TYPE_METHOD;
 	do_op.name = p_method;
 
 	for (int i = 0; i < VARIANT_ARG_MAX; i++) {
@@ -141,7 +141,7 @@ void UndoRedo::add_undo_method(Object *p_object, const String &p_method, VARIANT
 	if (Object::cast_to<Resource>(p_object))
 		undo_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	undo_op.type = Operation::TYPE_METHOD;
+	undo_op.type = OPERATION_TYPE_METHOD;
 	undo_op.name = p_method;
 
 	for (int i = 0; i < VARIANT_ARG_MAX; i++) {
@@ -159,7 +159,7 @@ void UndoRedo::add_do_property(Object *p_object, const String &p_property, const
 	if (Object::cast_to<Resource>(p_object))
 		do_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	do_op.type = Operation::TYPE_PROPERTY;
+	do_op.type = OPERATION_TYPE_PROPERTY;
 	do_op.name = p_property;
 	do_op.args[0] = p_value;
 	actions.write[current_action + 1].do_ops.push_back(do_op);
@@ -179,7 +179,7 @@ void UndoRedo::add_undo_property(Object *p_object, const String &p_property, con
 	if (Object::cast_to<Resource>(p_object))
 		undo_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	undo_op.type = Operation::TYPE_PROPERTY;
+	undo_op.type = OPERATION_TYPE_PROPERTY;
 	undo_op.name = p_property;
 	undo_op.args[0] = p_value;
 	actions.write[current_action + 1].undo_ops.push_back(undo_op);
@@ -194,7 +194,7 @@ void UndoRedo::add_do_reference(Object *p_object) {
 	if (Object::cast_to<Resource>(p_object))
 		do_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	do_op.type = Operation::TYPE_REFERENCE;
+	do_op.type = OPERATION_TYPE_REFERENCE;
 	actions.write[current_action + 1].do_ops.push_back(do_op);
 }
 void UndoRedo::add_undo_reference(Object *p_object) {
@@ -212,7 +212,7 @@ void UndoRedo::add_undo_reference(Object *p_object) {
 	if (Object::cast_to<Resource>(p_object))
 		undo_op.resref = Ref<Resource>(Object::cast_to<Resource>(p_object));
 
-	undo_op.type = Operation::TYPE_REFERENCE;
+	undo_op.type = OPERATION_TYPE_REFERENCE;
 	actions.write[current_action + 1].undo_ops.push_back(undo_op);
 }
 
@@ -225,7 +225,7 @@ void UndoRedo::_pop_history_tail() {
 
 	for (List<Operation>::Element *E = actions.write[0].undo_ops.front(); E; E = E->next()) {
 
-		if (E->get().type == Operation::TYPE_REFERENCE) {
+		if (E->get().type == OPERATION_TYPE_REFERENCE) {
 
 			Object *obj = ObjectDB::get_instance(E->get().object);
 			if (obj)
@@ -275,7 +275,7 @@ void UndoRedo::_process_operation_list(List<Operation>::Element *E) {
 
 		switch (op.type) {
 
-			case Operation::TYPE_METHOD: {
+			case OPERATION_TYPE_METHOD: {
 
 				Vector<const Variant *> argptrs;
 				argptrs.resize(VARIANT_ARG_MAX);
@@ -306,7 +306,7 @@ void UndoRedo::_process_operation_list(List<Operation>::Element *E) {
 					method_callback(method_callbck_ud, obj, op.name, VARIANT_ARGS_FROM_ARRAY(op.args));
 				}
 			} break;
-			case Operation::TYPE_PROPERTY: {
+			case OPERATION_TYPE_PROPERTY: {
 
 				obj->set(op.name, op.args[0]);
 #ifdef TOOLS_ENABLED
@@ -318,7 +318,7 @@ void UndoRedo::_process_operation_list(List<Operation>::Element *E) {
 					property_callback(prop_callback_ud, obj, op.name, op.args[0]);
 				}
 			} break;
-			case Operation::TYPE_REFERENCE: {
+			case OPERATION_TYPE_REFERENCE: {
 				//do nothing
 			} break;
 		}
@@ -407,6 +407,26 @@ void UndoRedo::set_property_notify_callback(PropertyNotifyCallback p_property_ca
 
 	property_callback = p_property_callback;
 	prop_callback_ud = p_ud;
+}
+
+Dictionary UndoRedo::get_action(int p_action) {
+	return actions[p_action].operator Dictionary();
+}
+
+Array UndoRedo::get_all_actions() {
+	Array ret;
+	for (int i = 0; i < actions.size(); i++) {
+		ret.append(actions[i].operator Dictionary());
+	}
+	return ret;
+}
+
+int UndoRedo::get_current_action() {
+	return current_action;
+}
+
+int UndoRedo::get_action_count() {
+	return actions.size();
 }
 
 UndoRedo::UndoRedo() {
@@ -543,6 +563,11 @@ void UndoRedo::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_version"), &UndoRedo::get_version);
 	ClassDB::bind_method(D_METHOD("redo"), &UndoRedo::redo);
 	ClassDB::bind_method(D_METHOD("undo"), &UndoRedo::undo);
+
+	ClassDB::bind_method(D_METHOD("get_action", "action"), &UndoRedo::get_action);
+	ClassDB::bind_method(D_METHOD("get_all_actions"), &UndoRedo::get_all_actions);
+	ClassDB::bind_method(D_METHOD("get_current_action"), &UndoRedo::get_current_action);
+	ClassDB::bind_method(D_METHOD("get_action_count"), &UndoRedo::get_action_count);
 
 	ADD_SIGNAL(MethodInfo("version_changed"));
 

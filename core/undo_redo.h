@@ -46,6 +46,12 @@ public:
 		MERGE_ALL
 	};
 
+	enum OperationType {
+		OPERATION_TYPE_METHOD,
+		OPERATION_TYPE_PROPERTY,
+		OPERATION_TYPE_REFERENCE
+	};
+
 	typedef void (*CommitNotifyCallback)(void *p_ud, const String &p_name);
 	Variant _add_do_method(const Variant **p_args, int p_argcount, Variant::CallError &r_error);
 	Variant _add_undo_method(const Variant **p_args, int p_argcount, Variant::CallError &r_error);
@@ -56,17 +62,30 @@ public:
 private:
 	struct Operation {
 
-		enum Type {
-			TYPE_METHOD,
-			TYPE_PROPERTY,
-			TYPE_REFERENCE
-		};
-
-		Type type;
+		UndoRedo::OperationType type;
 		Ref<Resource> resref;
 		ObjectID object;
 		String name;
 		Variant args[VARIANT_ARG_MAX];
+
+		operator Dictionary() const {
+			Dictionary d;
+			d["name"] = name;
+			d["type"] = type;
+			d["resref"] = resref.operator Variant();
+			d["object"] = ObjectDB::get_instance(object);
+
+			Array args_array;
+			for (int i = 0; i < VARIANT_ARG_MAX; i++) {
+				if (args[i].get_type() == Variant::NIL) {
+					break;
+				}
+				args_array.append(args[i]);
+			}
+			d["args"] = args_array;
+
+			return d;
+		}
 	};
 
 	struct Action {
@@ -74,6 +93,26 @@ private:
 		List<Operation> do_ops;
 		List<Operation> undo_ops;
 		uint64_t last_tick;
+
+		operator Dictionary() const {
+			Dictionary d;
+			d["name"] = name;
+
+			Array do_array;
+			for (const List<Operation>::Element *E = do_ops.front(); E; E = E->next()) {
+				do_array.append(E->get().operator Dictionary());
+			}
+			d["redo_operations"] = do_array;
+
+			Array undo_array;
+			for (const List<Operation>::Element *E = undo_ops.front(); E; E = E->next()) {
+				undo_array.append(E->get().operator Dictionary());
+			}
+			d["undo_operations"] = undo_array;
+
+			d["time"] = last_tick;
+			return d;
+		}
 	};
 
 	Vector<Action> actions;
@@ -127,6 +166,11 @@ public:
 
 	void set_method_notify_callback(MethodNotifyCallback p_method_callback, void *p_ud);
 	void set_property_notify_callback(PropertyNotifyCallback p_property_callback, void *p_ud);
+
+	Dictionary get_action(int p_action);
+	Array get_all_actions();
+	int get_current_action();
+	int get_action_count();
 
 	UndoRedo();
 	~UndoRedo();
