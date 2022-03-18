@@ -146,7 +146,7 @@ void BaseButton::_toggled(bool p_pressed) {
 
 void BaseButton::on_action_event(Ref<InputEvent> p_event) {
 
-	if (p_event->is_pressed()) {
+	if (p_event->is_pressed() && is_clickable()) {
 		status.press_attempt = true;
 		status.pressing_inside = true;
 		emit_signal("button_down");
@@ -178,10 +178,15 @@ void BaseButton::on_action_event(Ref<InputEvent> p_event) {
 				status.hovering = false;
 			}
 		}
-		// pressed state should be correct with button_up signal
-		emit_signal("button_up");
-		status.press_attempt = false;
-		status.pressing_inside = false;
+
+		if (is_clickable()) {
+			if (status.press_attempt) {
+				emit_signal("button_up");
+				status.press_attempt = false;
+			}
+			status.pressing_inside = false;
+		}
+
 	}
 
 	update();
@@ -398,6 +403,20 @@ Ref<ButtonGroup> BaseButton::get_button_group() const {
 	return button_group;
 }
 
+void BaseButton::set_clickable(bool p_clickable) {
+	clickable = p_clickable;
+
+	if (!clickable && (status.press_attempt || status.pressing_inside)) {
+		emit_signal("button_up");
+		status.press_attempt = false;
+		status.pressing_inside = false;
+	}
+}
+
+bool BaseButton::is_clickable() const {
+	return clickable;
+}
+
 void BaseButton::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("_gui_input"), &BaseButton::_gui_input);
@@ -427,6 +446,9 @@ void BaseButton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_button_group", "button_group"), &BaseButton::set_button_group);
 	ClassDB::bind_method(D_METHOD("get_button_group"), &BaseButton::get_button_group);
 
+	ClassDB::bind_method(D_METHOD("set_clickable"), &BaseButton::set_clickable);
+	ClassDB::bind_method(D_METHOD("is_clickable"), &BaseButton::is_clickable);
+
 	BIND_VMETHOD(MethodInfo("_pressed"));
 	BIND_VMETHOD(MethodInfo("_toggled", PropertyInfo(Variant::BOOL, "button_pressed")));
 
@@ -434,6 +456,7 @@ void BaseButton::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("button_up"));
 	ADD_SIGNAL(MethodInfo("button_down"));
 	ADD_SIGNAL(MethodInfo("toggled", PropertyInfo(Variant::BOOL, "button_pressed")));
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "clickable"), "set_clickable", "is_clickable");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "disabled"), "set_disabled", "is_disabled");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "toggle_mode"), "set_toggle_mode", "is_toggle_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "shortcut_in_tooltip"), "set_shortcut_in_tooltip", "is_shortcut_in_tooltip_enabled");
@@ -469,6 +492,7 @@ BaseButton::BaseButton() {
 	enabled_focus_mode = FOCUS_ALL;
 	action_mode = ACTION_MODE_BUTTON_RELEASE;
 	button_mask = BUTTON_MASK_LEFT;
+	clickable = true;
 }
 
 BaseButton::~BaseButton() {

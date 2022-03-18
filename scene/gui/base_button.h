@@ -52,6 +52,7 @@ private:
 	bool keep_pressed_outside;
 	FocusMode enabled_focus_mode;
 	Ref<ShortCut> shortcut;
+	bool clickable;
 
 	ActionMode action_mode;
 	struct Status {
@@ -127,6 +128,9 @@ public:
 
 	void set_button_group(const Ref<ButtonGroup> &p_group);
 	Ref<ButtonGroup> get_button_group() const;
+
+	void set_clickable(bool p_clickable);
+	bool is_clickable() const;
 
 	BaseButton();
 	~BaseButton();
