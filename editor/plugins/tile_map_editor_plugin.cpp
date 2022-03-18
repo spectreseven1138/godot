@@ -2048,7 +2048,7 @@ TileMapEditor::TileMapEditor(EditorNode *p_editor) {
 	palette->set_v_size_flags(SIZE_EXPAND_FILL);
 	palette->set_max_columns(0);
 	palette->set_icon_mode(ItemList::ICON_MODE_TOP);
-	palette->set_max_text_lines(2);
+	palette->set_max_text_lines(4);
 	palette->set_select_mode(ItemList::SELECT_MULTI);
 	palette->add_constant_override("vseparation", 8 * EDSCALE);
 	palette->connect("item_selected", this, "_palette_selected");

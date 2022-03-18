@@ -36,9 +36,9 @@ void WorldEnvironment::_notification(int p_what) {
 	if (p_what == Spatial::NOTIFICATION_ENTER_WORLD || p_what == Spatial::NOTIFICATION_ENTER_TREE) {
 
 		if (environment.is_valid()) {
-			if (get_viewport()->find_world()->get_environment().is_valid()) {
-				WARN_PRINT("World already has an environment (Another WorldEnvironment?), overriding.");
-			}
+			// if (get_viewport()->find_world()->get_environment().is_valid()) {
+			// 	WARN_PRINT("World already has an environment (Another WorldEnvironment?), overriding.");
+			// }
 			get_viewport()->find_world()->set_environment(environment);
 			add_to_group("_world_environment_" + itos(get_viewport()->find_world()->get_scenario().get_id()));
 		}
@@ -62,9 +62,9 @@ void WorldEnvironment::set_environment(const Ref<Environment> &p_environment) {
 
 	environment = p_environment;
 	if (is_inside_tree() && environment.is_valid()) {
-		if (get_viewport()->find_world()->get_environment().is_valid()) {
-			WARN_PRINT("World already has an environment (Another WorldEnvironment?), overriding.");
-		}
+		// if (get_viewport()->find_world()->get_environment().is_valid()) {
+		// 	WARN_PRINT("World already has an environment (Another WorldEnvironment?), overriding.");
+		// }
 		get_viewport()->find_world()->set_environment(environment);
 		add_to_group("_world_environment_" + itos(get_viewport()->find_world()->get_scenario().get_id()));
 	}
