@@ -459,6 +459,10 @@ private:
 					method(p_method) {
 			}
 			Target() { _id = 0; }
+
+			bool matches(const Connection *p_with) {
+				return p_with->target->get_instance_id() == _id && p_with->method == method;
+			}
 		};
 
 		struct Slot {
@@ -470,7 +474,8 @@ private:
 		};
 
 		MethodInfo user;
-		VMap<Target, Slot> slot_map;
+		// VMap<Target, Slot> slot_map;
+		List<Slot> slots;
 		Signal() {}
 	};
 

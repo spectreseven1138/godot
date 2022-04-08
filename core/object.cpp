@@ -1200,9 +1200,9 @@ Error Object::emit_signal(const StringName &p_name, const Variant **p_args, int 
 	//copy on write will ensure that disconnecting the signal or even deleting the object will not affect the signal calling.
 	//this happens automatically and will not change the performance of calling.
 	//awesome, isn't it?
-	VMap<Signal::Target, Signal::Slot> slot_map = s->slot_map;
+	// List<Signal::Slot> slots = s->slots;
 
-	int ssize = slot_map.size();
+	// int ssize = slots.size();
 
 	OBJ_DEBUG_LOCK
 
@@ -1210,12 +1210,14 @@ Error Object::emit_signal(const StringName &p_name, const Variant **p_args, int 
 
 	Error err = OK;
 
-	for (int i = 0; i < ssize; i++) {
+	// for (int i = 0; i < ssize; i++) {
+	for (List<Signal::Slot>::Element* element = s->slots.front(); element; element = element->next()) {
 
-		const Connection &c = slot_map.getv(i).conn;
+		const Connection &c = element->get().conn;
 
-		Object *target = ObjectDB::get_instance(slot_map.getk(i)._id);
-		if (!target) {
+		// Object *target = ObjectDB::get_instance(slot_map.getk(i)._id);
+		Object *target = c.target;
+		if (!target || !ObjectDB::instance_validate(target)) {
 			// Target might have been deleted during signal callback, this is expected and OK.
 			continue;
 		}
@@ -1431,9 +1433,9 @@ void Object::get_all_signal_connections(List<Connection> *p_connections) const {
 
 		const Signal *s = &signal_map[*S];
 
-		for (int i = 0; i < s->slot_map.size(); i++) {
+		for (auto *element = s->slots.front(); element; element = element->next()) {
 
-			p_connections->push_back(s->slot_map.getv(i).conn);
+			p_connections->push_back(element->get().conn);
 		}
 	}
 }
@@ -1444,8 +1446,8 @@ void Object::get_signal_connection_list(const StringName &p_signal, List<Connect
 	if (!s)
 		return; //nothing
 
-	for (int i = 0; i < s->slot_map.size(); i++)
-		p_connections->push_back(s->slot_map.getv(i).conn);
+	for (int i = 0; i < s->slots.size(); i++)
+		p_connections->push_back(s->slots[i].conn);
 }
 
 int Object::get_persistent_signal_connection_count() const {
@@ -1457,8 +1459,8 @@ int Object::get_persistent_signal_connection_count() const {
 
 		const Signal *s = &signal_map[*S];
 
-		for (int i = 0; i < s->slot_map.size(); i++) {
-			if (s->slot_map.getv(i).conn.flags & CONNECT_PERSIST) {
+		for (int i = 0; i < s->slots.size(); i++) {
+			if (s->slots[i].conn.flags & CONNECT_PERSIST) {
 				count += 1;
 			}
 		}
@@ -1504,14 +1506,6 @@ Error Object::connect(const StringName &p_signal, Object *p_to_object, const Str
 	}
 
 	Signal::Target target(p_to_object->get_instance_id(), p_to_method);
-	if (s->slot_map.has(target)) {
-		if (p_flags & CONNECT_REFERENCE_COUNTED) {
-			s->slot_map[target].reference_count++;
-			return OK;
-		} else {
-			ERR_FAIL_V_MSG(ERR_INVALID_PARAMETER, "Signal '" + p_signal + "' is already connected to given method '" + p_to_method + "' in that object.");
-		}
-	}
 
 	Signal::Slot slot;
 
@@ -1528,7 +1522,7 @@ Error Object::connect(const StringName &p_signal, Object *p_to_object, const Str
 		slot.reference_count = 1;
 	}
 
-	s->slot_map[target] = slot;
+	s->slots.push_back(slot);
 
 	return OK;
 }
@@ -1550,9 +1544,13 @@ bool Object::is_connected(const StringName &p_signal, Object *p_to_object, const
 
 	Signal::Target target(p_to_object->get_instance_id(), p_to_method);
 
-	return s->slot_map.has(target);
-	//const Map<Signal::Target,Signal::Slot>::Element *E = s->slot_map.find(target);
-	//return (E!=NULL);
+	for (auto *element = s->slots.front(); element; element = element->next()) {
+		if (target.matches(&element->get().conn)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void Object::disconnect(const StringName &p_signal, Object *p_to_object, const StringName &p_to_method) {
@@ -1573,22 +1571,30 @@ void Object::_disconnect(const StringName &p_signal, Object *p_to_object, const 
 
 	Signal::Target target(p_to_object->get_instance_id(), p_to_method);
 
-	ERR_FAIL_COND_MSG(!s->slot_map.has(target), "Disconnecting nonexistent signal '" + p_signal + "', slot: " + itos(target._id) + ":" + target.method + ".");
+	bool signal_found = false;
+	for (auto *element = s->slots.front(); element; element = element->next()) {
 
-	Signal::Slot *slot = &s->slot_map[target];
-
-	if (!p_force) {
-		slot->reference_count--; // by default is zero, if it was not referenced it will go below it
-		if (slot->reference_count >= 0) {
-			return;
+		if (!target.matches(&element->get().conn)) {
+			continue;
 		}
+
+		signal_found = true;
+
+		if (!p_force) {
+			element->get().reference_count--; // by default is zero, if it was not referenced it will go below it
+			if (element->get().reference_count >= 0) {
+				continue;
+			}
+		}
+
+		p_to_object->connections.erase(element->get().cE);
+
+		s->slots.erase(element);
 	}
 
-	p_to_object->connections.erase(slot->cE);
-	s->slot_map.erase(target);
-
-	if (s->slot_map.empty() && ClassDB::has_signal(get_class_name(), p_signal)) {
-		//not user signal, delete
+	ERR_FAIL_COND_MSG(!signal_found, "Disconnecting nonexistent signal '" + p_signal + "', slot: " + itos(target._id) + ":" + target.method + ".");
+	
+	if (s->slots.empty() && ClassDB::has_signal(get_class_name(), p_signal)) {
 		signal_map.erase(p_signal);
 	}
 }
@@ -2020,12 +2026,17 @@ Object::~Object() {
 		Signal *s = &signal_map[*S];
 
 		//brute force disconnect for performance
-		int slot_count = s->slot_map.size();
-		const VMap<Signal::Target, Signal::Slot>::Pair *slot_list = s->slot_map.get_array();
+		
+		for (List<Signal::Slot>::Element *slot = s->slots.front(); slot; slot = slot->next()) {
+			// s->slots[i].conn.target->connections.erase(s->slots[i].conn);
 
-		for (int i = 0; i < slot_count; i++) {
-
-			slot_list[i].value.conn.target->connections.erase(slot_list[i].value.cE);
+			Object *target = slot->get().conn.target;
+			for (List<Connection>::Element *connection = target->connections.front(); connection; connection = connection->next()) {
+				if (connection == slot->get().cE) {
+					target->connections.erase(connection);
+					break;
+				}
+			}
 		}
 
 		signal_map.erase(*S);
