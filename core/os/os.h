@@ -327,6 +327,8 @@ public:
 	virtual bool is_process_running(const ProcessID &p_pid) const = 0;
 	virtual void vibrate_handheld(int p_duration_ms = 500);
 
+	virtual bool get_system_dark_mode() const;
+
 	virtual Error shell_open(String p_uri);
 	virtual Error set_cwd(const String &p_cwd);
 

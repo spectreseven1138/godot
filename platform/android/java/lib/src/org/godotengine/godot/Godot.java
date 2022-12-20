@@ -56,6 +56,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Sensor;
@@ -1154,5 +1155,10 @@ public class Godot extends Fragment implements SensorEventListener, IDownloaderC
 				godotHost.onNewGodotInstanceRequested(args);
 			}
 		});
+	}
+
+	public boolean getDarkMode() {
+		int dark_mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+		return dark_mode == Configuration.UI_MODE_NIGHT_YES;
 	}
 }

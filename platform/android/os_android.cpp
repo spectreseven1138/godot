@@ -641,6 +641,10 @@ Error OS_Android::execute(const String &p_path, const List<String> &p_arguments,
 	}
 }
 
+bool OS_Android::get_system_dark_mode() const {
+	return godot_java->get_dark_mode();
+}
+
 Error OS_Android::create_instance(const List<String> &p_arguments, ProcessID *r_child_id) {
 	godot_java->create_new_godot_instance(p_arguments);
 	return OK;

@@ -869,6 +869,10 @@ void OS::add_frame_delay(bool p_can_draw) {
 	}
 }
 
+bool OS::get_system_dark_mode() const {
+	return false;
+}
+
 OS::OS() {
 	void *volatile stack_bottom;
 

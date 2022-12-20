@@ -6224,6 +6224,11 @@ bool GDScriptParser::_is_type_compatible(const DataType &p_container, const Data
 	ERR_FAIL_COND_V(p_container.kind == DataType::UNRESOLVED, false);
 	ERR_FAIL_COND_V(p_expression.kind == DataType::UNRESOLVED, false);
 
+	// Allow null to be assigned to anything
+	if (p_expression.kind == DataType::BUILTIN && p_expression.builtin_type == Variant::NIL) {
+		return true;
+	}
+
 	if (p_container.kind == DataType::BUILTIN && p_expression.kind == DataType::BUILTIN) {
 		bool valid = p_container.builtin_type == p_expression.builtin_type;
 		if (p_allow_implicit_conversion) {

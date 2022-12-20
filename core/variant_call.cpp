@@ -67,7 +67,7 @@ struct _VariantCall {
 			const Variant::Type *tptr = &arg_types[0];
 
 			for (int i = 0; i < arg_count; i++) {
-				if (tptr[i] == Variant::NIL || tptr[i] == p_args[i]->type) {
+				if (p_args[i]->type == Variant::NIL || tptr[i] == Variant::NIL || tptr[i] == p_args[i]->type) {
 					continue; // all good
 				}
 				if (!Variant::can_convert(p_args[i]->type, tptr[i])) {
@@ -1325,7 +1325,10 @@ Variant Variant::construct(const Variant::Type p_type, const Variant **p_args, i
 
 	} else if (p_argcount == 1 && p_args[0]->type == p_type) {
 		return *p_args[0]; //copy construct
-	} else if (p_argcount == 1 && (!p_strict || Variant::can_convert(p_args[0]->type, p_type))) {
+	} else if (p_argcount == 1 && p_args[0]->type == NIL) {
+		return Variant();
+	}
+	else if (p_argcount == 1 && (!p_strict || Variant::can_convert(p_args[0]->type, p_type))) {
 		//near match construct
 
 		switch (p_type) {

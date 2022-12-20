@@ -57,7 +57,7 @@ struct GDScriptDataType {
 	Ref<Script> script_type_ref;
 
 	bool is_type(const Variant &p_variant, bool p_allow_implicit_conversion = false) const {
-		if (!has_type) {
+		if (!has_type || p_variant.get_type() == Variant::NIL) {
 			return true; // Can't type check
 		}
 

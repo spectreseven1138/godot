@@ -72,6 +72,7 @@ private:
 	jmethodID _on_godot_main_loop_started = nullptr;
 	jmethodID _get_class_loader = nullptr;
 	jmethodID _create_new_godot_instance = nullptr;
+	jmethodID _get_dark_mode = nullptr;
 
 public:
 	GodotJavaWrapper(JNIEnv *p_env, jobject p_activity, jobject p_godot_instance);
@@ -108,6 +109,7 @@ public:
 	void vibrate(int p_duration_ms);
 	String get_input_fallback_mapping();
 	void create_new_godot_instance(List<String> args);
+	bool get_dark_mode();
 };
 
 #endif // JAVA_GODOT_WRAPPER_H

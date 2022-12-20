@@ -81,6 +81,7 @@ GodotJavaWrapper::GodotJavaWrapper(JNIEnv *p_env, jobject p_activity, jobject p_
 	_on_godot_setup_completed = p_env->GetMethodID(godot_class, "onGodotSetupCompleted", "()V");
 	_on_godot_main_loop_started = p_env->GetMethodID(godot_class, "onGodotMainLoopStarted", "()V");
 	_create_new_godot_instance = p_env->GetMethodID(godot_class, "createNewGodotInstance", "([Ljava/lang/String;)V");
+	_get_dark_mode = p_env->GetMethodID(godot_class, "getDarkMode", "()Z");
 
 	// get some Activity method pointers...
 	_get_class_loader = p_env->GetMethodID(activity_class, "getClassLoader", "()Ljava/lang/ClassLoader;");
@@ -356,5 +357,15 @@ void GodotJavaWrapper::create_new_godot_instance(List<String> args) {
 			env->SetObjectArrayElement(jargs, i, env->NewStringUTF(args[i].utf8().get_data()));
 		}
 		env->CallVoidMethod(godot_instance, _create_new_godot_instance, jargs);
+	}
+}
+
+bool GodotJavaWrapper::get_dark_mode() {
+	if (_get_dark_mode) {
+		JNIEnv *env = get_jni_env();
+		ERR_FAIL_NULL_V(env, false);
+		return env->CallBooleanMethod(godot_instance, _get_dark_mode);
+	} else {
+		return false;
 	}
 }
