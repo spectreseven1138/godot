@@ -322,7 +322,7 @@ public:
 			}
 		}
 
-		create_vpk(sfo->title + ".vpk", app_dir);
+		create_vpk(p_path, app_dir);
 		memdelete(sfo);
 		memdelete(da);
 		da = nullptr;
