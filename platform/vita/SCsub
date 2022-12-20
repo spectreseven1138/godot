@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+Import('env')
+files = [
+	"os_vita.cpp",
+	"godot_vita.cpp",
+	"context_egl_vita.cpp",
+	"joypad_vita.cpp",
+    "audio_driver_vita.cpp",
+]
+
+prog = env.add_program('#bin/godot', files)
+build_target = env['target']
+env.Append(BUILDERS = {
+    'VitaELF' : Builder(action = 'vita-elf-create $SOURCE $TARGET'),
+    'VitaEBOOT' : Builder(action = 'vita-make-fself -c -na $SOURCE $TARGET'),
+    'VitaParamSFO' : Builder(action = 'vita-mksfoex -s TITLE_ID=$title_id "$title_name" "$TARGET" -d ATTRIBUTE2=12 -d PARENTAL_LEVEL=1', suffix=".sfo"),
+    'VitaVPK' : Builder(action = 'vita-pack-vpk --sfo=$sfo --eboot=$eboot $TARGET', source_factory=env.fs.Dir),
+    }
+)
+stripped_elf_path = "#bin/vita_" + env['target'] + "_stripped"
+env.Command(stripped_elf_path, prog, [
+    Copy("$TARGET", "$SOURCE"),
+    "arm-vita-eabi-strip -g $TARGET"
+])
+env.VitaELF("#bin/vita_" + env['target'] + ".velf", stripped_elf_path)
+env.VitaEBOOT("#bin/eboot.bin", "#bin/vita_" + env['target'] + ".velf")
+#env.VitaParamSFO("#bin/param.sfo", source=[], title_id="GDOT00001", title_name="Godot Engine")
+#env.VitaVPK("#bin/out.vpk", source=[], sfo="bin/param.sfo", eboot="bin/eboot.bin")
+
+env.Command("#bin/vita_template/eboot.bin", "#bin/eboot.bin", [
+    Copy("$TARGET", "$SOURCE"),
+])
+env.Command("#bin/vita_template/", "#platform/vita/app/", [
+    Copy("$TARGET", "$SOURCE"),
+])

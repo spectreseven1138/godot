@@ -1264,7 +1264,11 @@ void RasterizerStorageGLES2::sky_set_texture(RID p_sky, RID p_panorama, int p_ra
 			glCopyTexSubImage2D(_cube_side_enum[i], lod, 0, 0, 0, 0, size, size);
 		}
 
+#ifdef VITA_ENABLED
+		size = 0;
+#else
 		size >>= 1;
+#endif
 
 		mm_level--;
 
@@ -5109,6 +5113,7 @@ void RasterizerStorageGLES2::_render_target_allocate(RenderTarget *rt) {
 	/* BACK FBO */
 	/* For MSAA */
 
+#ifndef VITA_ENABLED
 #ifndef JAVASCRIPT_ENABLED
 	if (rt->msaa >= VS::VIEWPORT_MSAA_2X && rt->msaa <= VS::VIEWPORT_MSAA_16X && config.multisample_supported) {
 		rt->multisample_active = true;
@@ -5184,6 +5189,7 @@ void RasterizerStorageGLES2::_render_target_allocate(RenderTarget *rt) {
 
 	} else
 #endif // JAVASCRIPT_ENABLED
+#endif // VITA_ENABLED
 	{
 		rt->multisample_active = false;
 	}

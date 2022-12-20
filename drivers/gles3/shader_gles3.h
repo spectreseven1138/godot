@@ -387,7 +387,9 @@ public:
 	GLint get_uniform_location(const String &p_name) const;
 	GLint get_uniform_location(int p_index) const;
 
-	static _FORCE_INLINE_ ShaderGLES3 *get_active() { return active; };
+	static _FORCE_INLINE_ ShaderGLES3 *get_active() {
+		return active;
+	};
 	bool bind();
 	void unbind();
 
