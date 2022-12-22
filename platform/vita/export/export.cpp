@@ -56,17 +56,20 @@ class EditorExportPlatformVita : public EditorExportPlatform {
 public:
 	virtual void get_preset_features(const Ref<EditorExportPreset> &p_preset, List<String> *r_features) {
 		String driver = ProjectSettings::get_singleton()->get("rendering/quality/driver/driver_name");
-		if (driver == "GLES2") {
-			r_features->push_back("etc");
-		} else if (driver == "GLES3") {
-			if (ProjectSettings::get_singleton()->get("rendering/quality/driver/fallback_to_gles2")) {
+		if ((driver == "GLES2") || (driver == "GLES3" && ProjectSettings::get_singleton()->get("rendering/quality/driver/fallback_to_gles2"))) {
+			if (p_preset->get("texture_format/etc")) {
 				r_features->push_back("etc");
+			}
+			if (p_preset->get("texture_format/pvrtc")) {
+				r_features->push_back("pvrtc");
 			}
 		}
 	}
 
 	virtual void get_export_options(List<ExportOption> *r_options) {
 		String title = ProjectSettings::get_singleton()->get("application/config/name");
+		r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, "texture_format/etc"), false));
+		r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, "texture_format/pvrtc"), false));
 		r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "param_sfo/title", PROPERTY_HINT_PLACEHOLDER_TEXT, title), title));
 		r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "param_sfo/title_id", PROPERTY_HINT_PLACEHOLDER_TEXT, "GDOT00001 (Make sure it's CAPITALIZED and 9 characters MAX"), "GDOT00001"));
 		r_options->push_back(ExportOption(PropertyInfo(Variant::INT, "param_sfo/parental_level", PROPERTY_HINT_MAX, "11"), 1));
@@ -111,11 +114,6 @@ public:
 				find_export_template(TEMPLATE_RELEASE) == String();
 
 		bool valid = !r_missing_templates;
-		String etc_error = test_etc2();
-		if (etc_error != String()) {
-			err += etc_error;
-			valid = false;
-		}
 
 		if (!err.empty()) {
 			r_error = err;

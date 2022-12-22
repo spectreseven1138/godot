@@ -30,7 +30,7 @@
 
 #include "ip_unix.h"
 
-#if defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED)
+#if defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED) || defined(VITA_ENABLED)
 
 #include <string.h>
 
@@ -53,14 +53,18 @@
 #ifdef __FreeBSD__
 #include <sys/types.h>
 #endif
+#ifndef VITA_ENABLED
 #include <ifaddrs.h>
+#endif
 #endif
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #ifdef __FreeBSD__
 #include <netinet/in.h>
 #endif
+#ifndef VITA_ENABLED
 #include <net/if.h> // Order is important on OpenBSD, leave as last
+#endif
 #endif
 
 static IP_Address _sockaddr2ip(struct sockaddr *p_addr) {
@@ -208,7 +212,11 @@ void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) co
 #endif
 
 #else // UNIX
-
+#if defined(VITA_ENABLED)
+void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) const {
+	// Ok there copilot
+}
+#else
 void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) const {
 	struct ifaddrs *ifAddrStruct = nullptr;
 	struct ifaddrs *ifa = nullptr;
@@ -245,6 +253,7 @@ void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) co
 		freeifaddrs(ifAddrStruct);
 	}
 }
+#endif
 #endif
 
 void IP_Unix::make_default() {

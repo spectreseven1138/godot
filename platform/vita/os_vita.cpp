@@ -31,6 +31,7 @@
 #include "os_vita.h"
 
 #include "core/array.h"
+#include "core/os/keyboard.h"
 #include "drivers/dummy/rasterizer_dummy.h"
 #include "drivers/dummy/texture_loader_dummy.h"
 #include "drivers/gles2/rasterizer_gles2.h"
@@ -98,7 +99,9 @@ Error OS_Vita::initialize(const VideoMode &p_desired, int p_video_driver, int p_
 		OS::get_singleton()->alert("OpenGL ES 3 is not supported on this device.\n\n"
 								   "Please enable the option \"Fallback to OpenGL ES 2.0\" in the options menu.\n",
 				"OpenGL ES 3 Not Supported");
-		gl_initialization_error = true;
+		//gl_initialization_error = true;
+		p_video_driver = VIDEO_DRIVER_GLES2;
+		gles2 = true;
 	}
 
 	if (!gl_initialization_error) {
@@ -145,10 +148,19 @@ Error OS_Vita::initialize(const VideoMode &p_desired, int p_video_driver, int p_
 	input->set_emulate_mouse_from_touch(true);
 	joypad = memnew(JoypadVita(input));
 
+	sceSysmoduleLoadModule(SCE_SYSMODULE_IME); // Enable the IME module for Keyboard input
+
+	// Enable SceTouch
 	sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
 
 	sceTouchGetPanelInfo(0, &front_panel_info);
 	front_panel_size = Vector2(front_panel_info.maxAaX, front_panel_info.maxAaY);
+
+	// Enable SceMotion (Battery Usage go brrrrrr)
+	sceMotionStartSampling();
+	sceMotionMagnetometerOn();
+
+	sceMotionSetAngleThreshold(45);
 
 	return OK;
 }
@@ -216,6 +228,7 @@ bool OS_Vita::can_draw() const {
 	return true;
 }
 
+static bool libime_active = false;
 void OS_Vita::run() {
 	if (!main_loop)
 		return;
@@ -225,6 +238,10 @@ void OS_Vita::run() {
 	while (true) {
 		joypad->process_joypads();
 		process_touch();
+		process_motion();
+		if (libime_active) {
+			sceImeUpdate();
+		}
 
 		if (Main::iteration())
 			break;
@@ -278,6 +295,30 @@ void OS_Vita::process_touch() {
 	last_touch_count = touch.reportNum;
 }
 
+void OS_Vita::process_motion() {
+	sceMotionGetState(&motion_state);
+	process_accelerometer(Vector3(motion_state.acceleration.x, motion_state.acceleration.y, motion_state.acceleration.z));
+	process_gravity(Vector3(motion_state.basicOrientation.x, motion_state.basicOrientation.y, motion_state.basicOrientation.z));
+	process_gyroscope(Vector3(motion_state.angularVelocity.x, motion_state.angularVelocity.y, motion_state.angularVelocity.z));
+	process_magnetometer(Vector3(0, 0, 0)); // No idea how to calculate this. I'm not a linear maths guy.
+}
+
+void OS_Vita::process_accelerometer(const Vector3 &m_accelerometer) {
+	input->set_accelerometer(m_accelerometer);
+}
+
+void OS_Vita::process_gravity(const Vector3 &m_gravity) {
+	input->set_gravity(m_gravity);
+}
+
+void OS_Vita::process_magnetometer(const Vector3 &m_magnetometer) {
+	input->set_magnetometer(m_magnetometer);
+}
+
+void OS_Vita::process_gyroscope(const Vector3 &m_gyroscope) {
+	input->set_gyroscope(m_gyroscope);
+}
+
 String OS_Vita::get_data_path() const {
 	return "ux0:/data";
 }
@@ -312,18 +353,117 @@ String OS_Vita::get_model_name() const {
 	return "Sony Playstation Vita";
 }
 
+void utf16_to_utf8(const uint16_t *src, uint8_t *dst) {
+	int i;
+	for (i = 0; src[i]; i++) {
+		if ((src[i] & 0xFF80) == 0) {
+			*(dst++) = src[i] & 0xFF;
+		} else if ((src[i] & 0xF800) == 0) {
+			*(dst++) = ((src[i] >> 6) & 0xFF) | 0xC0;
+			*(dst++) = (src[i] & 0x3F) | 0x80;
+		} else if ((src[i] & 0xFC00) == 0xD800 && (src[i + 1] & 0xFC00) == 0xDC00) {
+			*(dst++) = (((src[i] + 64) >> 8) & 0x3) | 0xF0;
+			*(dst++) = (((src[i] >> 2) + 16) & 0x3F) | 0x80;
+			*(dst++) = ((src[i] >> 4) & 0x30) | 0x80 | ((src[i + 1] << 2) & 0xF);
+			*(dst++) = (src[i + 1] & 0x3F) | 0x80;
+			i += 1;
+		} else {
+			*(dst++) = ((src[i] >> 12) & 0xF) | 0xE0;
+			*(dst++) = ((src[i] >> 6) & 0x3F) | 0x80;
+			*(dst++) = (src[i] & 0x3F) | 0x80;
+		}
+	}
+
+	*dst = '\0';
+}
+
+static char libime_initval[8] = { 1 };
+static unsigned int libime_height = 0;
+static char libime_out[SCE_IME_MAX_PREEDIT_LENGTH * 2 + 8];
+static unsigned int libime_work[SCE_IME_WORK_BUFFER_SIZE / sizeof(unsigned int)];
+static SceImeCaret caret_rev;
+
+void vita_ime_event_handler(void *arg, const SceImeEventData *e) {
+	uint8_t utf8_buffer[SCE_IME_MAX_TEXT_LENGTH] = { '\0' };
+	switch (e->id) {
+		case SCE_IME_EVENT_OPEN:
+			libime_height = e->param.rect.height;
+			break;
+		case SCE_IME_EVENT_UPDATE_TEXT:
+			if (e->param.text.caretIndex == 0) {
+				OS_Vita::get_singleton()->key(KEY_BACKSPACE, true);
+				OS_Vita::get_singleton()->key(KEY_BACKSPACE, false);
+				sceImeSetText((SceWChar16 *)libime_initval, 4);
+			} else {
+				String character;
+				utf16_to_utf8((uint16_t *)&libime_out[2], utf8_buffer);
+				character.parse_utf8(utf8_buffer);
+				OS_Vita::get_singleton()->key(character[0], true);
+				OS_Vita::get_singleton()->key(character[0], false);
+				sceClibMemset(&caret_rev, 0, sizeof(SceImeCaret));
+				caret_rev.index = 1;
+				sceImeSetCaret(&caret_rev);
+				sceImeSetText((SceWChar16 *)libime_initval, 4);
+			}
+			break;
+		case SCE_IME_EVENT_PRESS_ENTER:
+			OS_Vita::get_singleton()->key(KEY_ENTER, true);
+			OS_Vita::get_singleton()->key(KEY_ENTER, false);
+		case SCE_IME_EVENT_PRESS_CLOSE:
+			libime_active = false;
+			libime_height = 0;
+			sceImeClose();
+			break;
+	}
+}
+
+void OS_Vita::key(uint32_t p_key, bool p_pressed) {
+	Ref<InputEventKey> ev;
+	ev.instance();
+	ev->set_echo(false);
+	ev->set_pressed(p_pressed);
+	ev->set_scancode(p_key);
+	ev->set_unicode(p_key);
+	input->parse_input_event(ev);
+};
+
 bool OS_Vita::has_virtual_keyboard() const {
 	return true;
 }
 
 int OS_Vita::get_virtual_keyboard_height() const {
-	return 200;
+	return (int)libime_height;
 }
 
 void OS_Vita::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end) {
+	if (!libime_active) {
+		SceImeParam param;
+		sceImeParamInit(&param);
+
+		sceClibMemset(libime_out, 0, (SCE_IME_MAX_PREEDIT_LENGTH * 2 + 6));
+
+		param.supportedLanguages = SCE_IME_LANGUAGE_ENGLISH;
+		param.languagesForced = false;
+		param.type = SCE_IME_TYPE_DEFAULT;
+		param.option = SCE_IME_OPTION_NO_ASSISTANCE;
+		param.inputTextBuffer = (SceWChar16 *)libime_out;
+		param.maxTextLength = 4;
+		param.handler = vita_ime_event_handler;
+		param.filter = NULL;
+		param.initialText = (SceWChar16 *)libime_initval;
+		param.arg = NULL;
+		param.work = libime_work;
+
+		sceImeOpen(&param);
+		libime_active = true;
+	}
 }
 
 void OS_Vita::hide_virtual_keyboard() {
+	if (libime_active) {
+		libime_active = false;
+		sceImeClose();
+	}
 }
 
 void OS_Vita::set_offscreen_gl_available(bool p_available) {
@@ -347,6 +487,10 @@ bool OS_Vita::_check_internal_feature_support(const String &p_feature) {
 	}
 	return false;
 }
+
+OS_Vita *OS_Vita::get_singleton() {
+	return (OS_Vita *)OS::get_singleton();
+};
 
 OS_Vita::OS_Vita() {
 	video_mode.width = 960;

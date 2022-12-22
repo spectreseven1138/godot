@@ -30,6 +30,7 @@
 
 #include "main/input_default.h"
 #include <psp2/ctrl.h>
+#include <psp2/motion.h>
 #include <psp2/touch.h>
 
 #ifndef JOYPAD_VITA_H

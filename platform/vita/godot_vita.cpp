@@ -38,7 +38,10 @@
 
 #include <taihen.h>
 
-#define MEMORY_NEWLIB_MB 100
+#ifndef MEMORY_GRAPHICS_MB
+#define MEMORY_GRAPHICS_MB 256 // Default Split, 256 Graphics/221 Main
+#endif
+#define MEMORY_NEWLIB_MB (477 - MEMORY_GRAPHICS_MB)
 #define MEMORY_SCELIBC_MB 10
 
 //#define DEVKIT_ENABLED 1

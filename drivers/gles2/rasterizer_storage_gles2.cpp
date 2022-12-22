@@ -112,6 +112,11 @@ PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glFramebufferTexture2DMultisampleEXT
 #include <GLES2/gl2ext.h>
 #define glRenderbufferStorageMultisample glRenderbufferStorageMultisampleANGLE
 #define glFramebufferTexture2DMultisample glFramebufferTexture2DMultisampleANGLE
+
+#elif defined(VITA_ENABLED)
+#include <GLES2/gl2ext.h>
+#define glRenderbufferStorageMultisample glRenderbufferStorageMultisampleIMG
+#define glFramebufferTexture2DMultisample glFramebufferTexture2DMultisampleIMG
 #endif
 
 #define GL_TEXTURE_3D 0x806F
@@ -362,7 +367,6 @@ Ref<Image> RasterizerStorageGLES2::_get_gl_image_and_format(const Ref<Image> &p_
 				r_gl_format = GL_RGBA;
 				r_gl_type = GL_UNSIGNED_BYTE;
 				r_compressed = true;
-
 			} else {
 				need_decompress = true;
 			}
@@ -373,7 +377,6 @@ Ref<Image> RasterizerStorageGLES2::_get_gl_image_and_format(const Ref<Image> &p_
 				r_gl_format = GL_RGBA;
 				r_gl_type = GL_UNSIGNED_BYTE;
 				r_compressed = true;
-
 			} else {
 				need_decompress = true;
 			}
@@ -385,7 +388,6 @@ Ref<Image> RasterizerStorageGLES2::_get_gl_image_and_format(const Ref<Image> &p_
 				r_gl_format = GL_RGBA;
 				r_gl_type = GL_UNSIGNED_BYTE;
 				r_compressed = true;
-
 			} else {
 				need_decompress = true;
 			}
@@ -397,7 +399,6 @@ Ref<Image> RasterizerStorageGLES2::_get_gl_image_and_format(const Ref<Image> &p_
 				r_gl_format = GL_RGBA;
 				r_gl_type = GL_UNSIGNED_BYTE;
 				r_compressed = true;
-
 			} else {
 				need_decompress = true;
 			}
@@ -531,7 +532,7 @@ void RasterizerStorageGLES2::texture_allocate(RID p_texture, int p_width, int p_
 			texture->images.resize(1);
 		} break;
 		case VS::TEXTURE_TYPE_EXTERNAL: {
-#ifdef ANDROID_ENABLED
+#if defined(ANDROID_ENABLED) || defined(VITA_ENABLED)
 			texture->target = _GL_TEXTURE_EXTERNAL_OES;
 #else
 			texture->target = GL_TEXTURE_2D;
@@ -5113,7 +5114,6 @@ void RasterizerStorageGLES2::_render_target_allocate(RenderTarget *rt) {
 	/* BACK FBO */
 	/* For MSAA */
 
-#ifndef VITA_ENABLED
 #ifndef JAVASCRIPT_ENABLED
 	if (rt->msaa >= VS::VIEWPORT_MSAA_2X && rt->msaa <= VS::VIEWPORT_MSAA_16X && config.multisample_supported) {
 		rt->multisample_active = true;
@@ -5189,7 +5189,6 @@ void RasterizerStorageGLES2::_render_target_allocate(RenderTarget *rt) {
 
 	} else
 #endif // JAVASCRIPT_ENABLED
-#endif // VITA_ENABLED
 	{
 		rt->multisample_active = false;
 	}
@@ -6237,12 +6236,12 @@ void RasterizerStorageGLES2::initialize() {
 	config.s3tc_supported = config.extensions.has("GL_EXT_texture_compression_s3tc") || config.extensions.has("WEBGL_compressed_texture_s3tc");
 	config.etc1_supported = config.extensions.has("GL_OES_compressed_ETC1_RGB8_texture") || config.extensions.has("WEBGL_compressed_texture_etc1");
 	config.pvrtc_supported = config.extensions.has("GL_IMG_texture_compression_pvrtc") || config.extensions.has("WEBGL_compressed_texture_pvrtc");
-	config.support_npot_repeat_mipmap = config.extensions.has("GL_OES_texture_npot");
+	config.support_npot_repeat_mipmap = config.extensions.has("GL_OES_texture_npot") || config.extensions.has("GL_IMG_texture_npot");
 
 	// If the desktop build is using S3TC, and you export / run from the IDE for android, if the device supports
 	// S3TC it will crash trying to load these textures, as they are not exported in the APK. This is a simple way
 	// to prevent Android devices trying to load S3TC, by faking lack of hardware support.
-#if defined(ANDROID_ENABLED) || defined(IPHONE_ENABLED)
+#if defined(ANDROID_ENABLED) || defined(IPHONE_ENABLED) || defined(VITA_ENABLED)
 	config.s3tc_supported = false;
 #endif
 
