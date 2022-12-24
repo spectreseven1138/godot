@@ -55,6 +55,9 @@
 #endif
 #ifndef VITA_ENABLED
 #include <ifaddrs.h>
+#else
+#include <psp2/net/netctl.h>
+#include <psp2/sysmodule.h>
 #endif
 #endif
 #include <arpa/inet.h>
@@ -214,7 +217,38 @@ void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) co
 #else // UNIX
 #if defined(VITA_ENABLED)
 void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) const {
-	// Ok there copilot
+
+	if (sceSysmoduleIsLoaded(SCE_SYSMODULE_NET) != SCE_SYSMODULE_LOADED) {
+		sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
+	}
+
+	if (sceNetShowNetstat() == SCE_NET_ERROR_ENOTINIT) {
+		static char memory[0x10 *0x400];
+
+		SceNetInitParam param;
+		param.memory = memory;
+		param.size = sizeof(memory);
+		param.flags = 0;
+
+		sceNetInit(&param);
+		sceNetCtlInit();
+	}
+
+	SceNetCtlInfo info;
+	Interface_Info interface;
+
+	if (sceNetCtlInetGetInfo(SCE_NETCTL_INFO_GET_IP_ADDRESS, &info) >= 0) {
+		interface.ip_addresses.push_front(IP_Address(info.ip_address));
+	}
+	else {
+		return;
+	}
+
+	interface.index = "0";
+	interface.name = "";
+	interface.name_friendly = "";
+
+	r_interfaces->insert(interface.name, interface);
 }
 #else
 void IP_Unix::get_local_interfaces(Map<String, Interface_Info> *r_interfaces) const {
