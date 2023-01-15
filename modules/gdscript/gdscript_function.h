@@ -73,6 +73,10 @@ public:
 			case UNINITIALIZED:
 				break;
 			case BUILTIN: {
+				if (p_variant.get_type() == Variant::NIL) {
+					return true;
+				}
+
 				Variant::Type var_type = p_variant.get_type();
 				bool valid = builtin_type == var_type;
 				if (valid && builtin_type == Variant::ARRAY && has_container_element_type()) {

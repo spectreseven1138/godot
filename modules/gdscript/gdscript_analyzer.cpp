@@ -4898,6 +4898,11 @@ bool GDScriptAnalyzer::is_type_compatible(const GDScriptParser::DataType &p_targ
 		return true;
 	}
 
+	if (p_source.kind == GDScriptParser::DataType::BUILTIN && p_source.builtin_type == Variant::NIL) {
+		// Null can be received by anything.
+		return true;
+	}
+
 	if (p_target.kind == GDScriptParser::DataType::BUILTIN) {
 		bool valid = p_source.kind == GDScriptParser::DataType::BUILTIN && p_target.builtin_type == p_source.builtin_type;
 		if (!valid && p_allow_implicit_conversion) {
@@ -4935,10 +4940,10 @@ bool GDScriptAnalyzer::is_type_compatible(const GDScriptParser::DataType &p_targ
 
 	// From here on the target type is an object, so we have to test polymorphism.
 
-	if (p_source.kind == GDScriptParser::DataType::BUILTIN && p_source.builtin_type == Variant::NIL) {
-		// null is acceptable in object.
-		return true;
-	}
+	// if (p_source.kind == GDScriptParser::DataType::BUILTIN && p_source.builtin_type == Variant::NIL) {
+	// 	// null is acceptable in object.
+	// 	return true;
+	// }
 
 	StringName src_native;
 	Ref<Script> src_script;

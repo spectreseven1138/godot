@@ -1210,7 +1210,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				Variant::Type var_type = (Variant::Type)_code_ptr[ip + 3];
 				GD_ERR_BREAK(var_type < 0 || var_type >= Variant::VARIANT_MAX);
 
-				if (src->get_type() != var_type) {
+				if (src->get_type() != Variant::NIL && src->get_type() != var_type) {
 #ifdef DEBUG_ENABLED
 					if (Variant::can_convert_strict(src->get_type(), var_type)) {
 #endif // DEBUG_ENABLED
@@ -2539,7 +2539,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				Variant::Type ret_type = (Variant::Type)_code_ptr[ip + 2];
 				GD_ERR_BREAK(ret_type < 0 || ret_type >= Variant::VARIANT_MAX);
 
-				if (r->get_type() != ret_type) {
+				if (r->get_type() != ret_type && r->get_type() != Variant::NIL) {
 					if (Variant::can_convert_strict(r->get_type(), ret_type)) {
 						Callable::CallError ce;
 						Variant::construct(ret_type, retvalue, const_cast<const Variant **>(&r), 1, ce);
