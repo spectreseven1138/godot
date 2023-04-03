@@ -39,6 +39,11 @@
 #include "core/templates/hash_map.h"
 #include "core/variant/dictionary.h"
 
+#include "modules/modules_enabled.gen.h"
+#ifdef MODULE_SVG_ENABLED
+#include "modules/svg/image_loader_svg.h"
+#endif
+
 #include <stdio.h>
 #include <cmath>
 
@@ -2146,6 +2151,23 @@ Ref<Image> Image::create_from_data(int p_width, int p_height, bool p_use_mipmaps
 	return image;
 }
 
+Ref<Image> Image::render_svg(const String &p_svg, real_t p_scale) {
+	Ref<Image> image;
+#ifdef MODULE_SVG_ENABLED
+	ERR_FAIL_COND_V_MSG(p_svg.is_empty(), Ref<Image>(), "Empty SVG document.");
+	ERR_FAIL_COND_V_MSG(p_scale <= 0, Ref<Image>(), "Scale must be positive.");
+	image.instantiate();
+	CharString svg = p_svg.utf8();
+	const char *svg_str = svg.get_data();
+
+	ImageLoaderSVG loader = ImageLoaderSVG();
+	loader.create_image_from_string(image, svg_str, p_scale, false, false);
+#else
+	WARN_PRINT_ONCE("Cannot render, the SVG module is disabled.");
+#endif
+	return image;
+}
+
 void Image::set_data(int p_width, int p_height, bool p_use_mipmaps, Format p_format, const Vector<uint8_t> &p_data) {
 	initialize_data(p_width, p_height, p_use_mipmaps, p_format, p_data);
 }
@@ -3411,6 +3433,7 @@ void Image::_bind_methods() {
 
 	ClassDB::bind_static_method("Image", D_METHOD("create", "width", "height", "use_mipmaps", "format"), &Image::create_empty);
 	ClassDB::bind_static_method("Image", D_METHOD("create_from_data", "width", "height", "use_mipmaps", "format", "data"), &Image::create_from_data);
+	ClassDB::bind_static_method("Image", D_METHOD("render_svg", "data", "scale"), &Image::render_svg);
 	ClassDB::bind_method(D_METHOD("set_data", "width", "height", "use_mipmaps", "format", "data"), &Image::set_data);
 
 	ClassDB::bind_method(D_METHOD("is_empty"), &Image::is_empty);
