@@ -532,16 +532,31 @@ template <class A, class B>
 class OperatorEvaluatorEqual {
 public:
 	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
-		const A &a = *VariantGetInternalPtr<A>::get_ptr(&p_left);
-		const B &b = *VariantGetInternalPtr<B>::get_ptr(&p_right);
-		*r_ret = a == b;
+		if (p_left.get_type() == Variant::NIL || p_right.get_type() == Variant::NIL) {
+			*r_ret = p_left.get_type() == p_right.get_type();
+		}
+		else {
+			const A &a = *VariantGetInternalPtr<A>::get_ptr(&p_left);
+			const B &b = *VariantGetInternalPtr<B>::get_ptr(&p_right);
+			*r_ret = a == b;
+		}
 		r_valid = true;
 	}
 	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
-		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = *VariantGetInternalPtr<A>::get_ptr(left) == *VariantGetInternalPtr<B>::get_ptr(right);
+		if (left->get_type() == Variant::NIL || right->get_type() == Variant::NIL) {
+			*VariantGetInternalPtr<bool>::get_ptr(r_ret) = left->get_type() == right->get_type();
+		}
+		else {
+			*VariantGetInternalPtr<bool>::get_ptr(r_ret) = *VariantGetInternalPtr<A>::get_ptr(left) == *VariantGetInternalPtr<B>::get_ptr(right);
+		}
 	}
 	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
-		PtrToArg<bool>::encode(PtrToArg<A>::convert(left) == PtrToArg<B>::convert(right), r_ret);
+		if (left == nullptr || right == nullptr) {
+			PtrToArg<bool>::encode(left == right, r_ret);
+		}
+		else {
+			PtrToArg<bool>::encode(PtrToArg<A>::convert(left) == PtrToArg<B>::convert(right), r_ret);
+		}
 	}
 	static Variant::Type get_return_type() { return Variant::BOOL; }
 };
@@ -599,20 +614,67 @@ public:
 	static Variant::Type get_return_type() { return Variant::BOOL; }
 };
 
+template <class A>
+class OperatorEvaluatorEqualVariantNil {
+public:
+	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
+		*r_ret = p_left.get_type() == Variant::NIL;
+		r_valid = true;
+	}
+	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
+		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = left->get_type() == Variant::NIL;
+	}
+	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
+		PtrToArg<bool>::encode(left == nullptr, r_ret);
+	}
+	static Variant::Type get_return_type() { return Variant::BOOL; }
+};
+
+template <class B>
+class OperatorEvaluatorEqualNilVariant {
+public:
+	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
+		*r_ret = p_right.get_type() == Variant::NIL;
+		r_valid = true;
+	}
+	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
+		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = right->get_type() == Variant::NIL;
+	}
+	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
+		PtrToArg<bool>::encode(right == nullptr, r_ret);
+	}
+	static Variant::Type get_return_type() { return Variant::BOOL; }
+};
+
 template <class A, class B>
 class OperatorEvaluatorNotEqual {
 public:
 	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
-		const A &a = *VariantGetInternalPtr<A>::get_ptr(&p_left);
-		const B &b = *VariantGetInternalPtr<B>::get_ptr(&p_right);
-		*r_ret = a != b;
+		if (p_left.get_type() == Variant::NIL || p_right.get_type() == Variant::NIL) {
+			*r_ret = p_left.get_type() != p_right.get_type();
+		}
+		else {
+			const A &a = *VariantGetInternalPtr<A>::get_ptr(&p_left);
+			const B &b = *VariantGetInternalPtr<B>::get_ptr(&p_right);
+			*r_ret = a != b;
+		}
 		r_valid = true;
 	}
 	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
-		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = *VariantGetInternalPtr<A>::get_ptr(left) != *VariantGetInternalPtr<B>::get_ptr(right);
+		if (left->get_type() == Variant::NIL || right->get_type() == Variant::NIL) {
+			*VariantGetInternalPtr<bool>::get_ptr(r_ret) = left->get_type() != right->get_type();
+		}
+		else {
+			*VariantGetInternalPtr<bool>::get_ptr(r_ret) = *VariantGetInternalPtr<A>::get_ptr(left) != *VariantGetInternalPtr<B>::get_ptr(right);
+		}
 	}
 	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
-		PtrToArg<bool>::encode(PtrToArg<A>::convert(left) != PtrToArg<B>::convert(right), r_ret);
+		if (left == nullptr || right == nullptr) {
+			PtrToArg<bool>::encode(left != right, r_ret);
+		}
+		else {
+			PtrToArg<bool>::encode(PtrToArg<A>::convert(left) != PtrToArg<B>::convert(right), r_ret);
+		}
 	}
 	static Variant::Type get_return_type() { return Variant::BOOL; }
 };
@@ -666,6 +728,38 @@ public:
 	}
 	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
 		PtrToArg<bool>::encode(nullptr != PtrToArg<Object *>::convert(right), r_ret);
+	}
+	static Variant::Type get_return_type() { return Variant::BOOL; }
+};
+
+template <class A>
+class OperatorEvaluatorNotEqualVariantNil {
+public:
+	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
+		*r_ret = p_left.get_type() != Variant::NIL;
+		r_valid = true;
+	}
+	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
+		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = left->get_type() != Variant::NIL;
+	}
+	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
+		PtrToArg<bool>::encode(left != nullptr, r_ret);
+	}
+	static Variant::Type get_return_type() { return Variant::BOOL; }
+};
+
+template <class B>
+class OperatorEvaluatorNotEqualNilVariant {
+public:
+	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
+		*r_ret = p_right.get_type() != Variant::NIL;
+		r_valid = true;
+	}
+	static inline void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
+		*VariantGetInternalPtr<bool>::get_ptr(r_ret) = right->get_type() != Variant::NIL;
+	}
+	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
+		PtrToArg<bool>::encode(right != nullptr, r_ret);
 	}
 	static Variant::Type get_return_type() { return Variant::BOOL; }
 };

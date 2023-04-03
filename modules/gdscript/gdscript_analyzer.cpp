@@ -1761,6 +1761,17 @@ void GDScriptAnalyzer::resolve_assignable(GDScriptParser::AssignableNode *p_assi
 			} else {
 				type.type_source = GDScriptParser::DataType::INFERRED;
 			}
+		} else if (initializer_type.builtin_type == Variant::NIL) {
+			// type.type_source =
+			// if (!type.is_set() || (type.is_hard_type() && type.kind == GDScriptParser::DataType::BUILTIN && type.builtin_type == Variant::NIL && !is_constant)) {
+			// 	type.kind = GDScriptParser::DataType::VARIANT;
+			// }
+
+			// if (p_assignable->infer_datatype || is_constant) {
+			// 	type.type_source = GDScriptParser::DataType::ANNOTATED_INFERRED;
+			// } else {
+			// 	type.type_source = GDScriptParser::DataType::INFERRED;
+			// }
 		} else if (!specified_type.is_variant()) {
 			if (initializer_type.is_variant() || !initializer_type.is_hard_type()) {
 				mark_node_unsafe(p_assignable->initializer);
@@ -2309,14 +2320,15 @@ static bool enum_has_value(const GDScriptParser::DataType p_type, int64_t p_valu
 #endif
 
 void GDScriptAnalyzer::update_const_expression_builtin_type(GDScriptParser::ExpressionNode *p_expression, const GDScriptParser::DataType &p_type, const char *p_usage, bool p_is_cast) {
-	if (p_expression->get_datatype() == p_type) {
+	GDScriptParser::DataType expression_type = p_expression->get_datatype();
+
+	if (expression_type == p_type || expression_type.builtin_type == Variant::NIL) {
 		return;
 	}
 	if (p_type.kind != GDScriptParser::DataType::BUILTIN && p_type.kind != GDScriptParser::DataType::ENUM) {
 		return;
 	}
 
-	GDScriptParser::DataType expression_type = p_expression->get_datatype();
 	bool is_enum_cast = p_is_cast && p_type.kind == GDScriptParser::DataType::ENUM && p_type.is_meta_type == false && expression_type.builtin_type == Variant::INT;
 	if (!is_enum_cast && !is_type_compatible(p_type, expression_type, true, p_expression)) {
 		push_error(vformat(R"(Cannot %s a value of type "%s" as "%s".)", p_usage, expression_type.to_string(), p_type.to_string()), p_expression);

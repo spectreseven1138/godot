@@ -1242,22 +1242,24 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				GD_ERR_BREAK(native_type_idx < 0 || native_type_idx >= _global_names_count);
 				const StringName native_type = _global_names_ptr[native_type_idx];
 
-				if (src->get_type() != Variant::ARRAY) {
+				if (src->get_type() != Variant::NIL) {
+					if (src->get_type() != Variant::ARRAY) {
 #ifdef DEBUG_ENABLED
-					err_text = vformat(R"(Trying to assign a value of type "%s" to a variable of type "Array[%s]".)",
-							_get_var_type(src), _get_element_type(builtin_type, native_type, *script_type));
+						err_text = vformat(R"(Trying to assign a value of type "%s" to a variable of type "Array[%s]".)",
+								_get_var_type(src), _get_element_type(builtin_type, native_type, *script_type));
 #endif // DEBUG_ENABLED
-					OPCODE_BREAK;
-				}
+						OPCODE_BREAK;
+					}
 
-				Array *array = VariantInternal::get_array(src);
+					Array *array = VariantInternal::get_array(src);
 
-				if (array->get_typed_builtin() != ((uint32_t)builtin_type) || array->get_typed_class_name() != native_type || array->get_typed_script() != *script_type || array->get_typed_class_name() != native_type) {
+					if (array->get_typed_builtin() != ((uint32_t)builtin_type) || array->get_typed_class_name() != native_type || array->get_typed_script() != *script_type || array->get_typed_class_name() != native_type) {
 #ifdef DEBUG_ENABLED
-					err_text = vformat(R"(Trying to assign an array of type "%s" to a variable of type "Array[%s]".)",
-							_get_var_type(src), _get_element_type(builtin_type, native_type, *script_type));
+						err_text = vformat(R"(Trying to assign an array of type "%s" to a variable of type "Array[%s]".)",
+								_get_var_type(src), _get_element_type(builtin_type, native_type, *script_type));
 #endif // DEBUG_ENABLED
-					OPCODE_BREAK;
+						OPCODE_BREAK;
+					}
 				}
 
 				*dst = *src;

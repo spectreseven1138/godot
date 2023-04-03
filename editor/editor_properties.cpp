@@ -1749,7 +1749,7 @@ void EditorPropertyVector2::setup(double p_min, double p_max, double p_step, boo
 	if (!p_link) {
 		linked->hide();
 	} else {
-		linked->set_pressed(true);
+		linked->set_pressed(false);
 	}
 }
 
@@ -2031,7 +2031,7 @@ void EditorPropertyVector3::setup(double p_min, double p_max, double p_step, boo
 	if (!p_link) {
 		linked->hide();
 	} else {
-		linked->set_pressed(true);
+		linked->set_pressed(false);
 	}
 }
 
@@ -2161,7 +2161,7 @@ void EditorPropertyVector2i::setup(int p_min, int p_max, bool p_link, const Stri
 	if (!p_link) {
 		linked->hide();
 	} else {
-		linked->set_pressed(true);
+		linked->set_pressed(false);
 	}
 }
 
@@ -2414,7 +2414,7 @@ void EditorPropertyVector3i::setup(int p_min, int p_max, bool p_link, const Stri
 	if (!p_link) {
 		linked->hide();
 	} else {
-		linked->set_pressed(true);
+		linked->set_pressed(false);
 	}
 }
 
