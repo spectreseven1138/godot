@@ -314,6 +314,10 @@ int OS::get_process_id() const {
 	return ::OS::get_singleton()->get_process_id();
 }
 
+bool OS::get_system_dark_mode() const {
+	return ::OS::get_singleton()->get_system_dark_mode();
+}
+
 bool OS::has_environment(const String &p_var) const {
 	return ::OS::get_singleton()->has_environment(p_var);
 }
@@ -551,6 +555,7 @@ void OS::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("shell_open", "uri"), &OS::shell_open);
 	ClassDB::bind_method(D_METHOD("is_process_running", "pid"), &OS::is_process_running);
 	ClassDB::bind_method(D_METHOD("get_process_id"), &OS::get_process_id);
+	ClassDB::bind_method(D_METHOD("get_system_dark_mode"), &OS::get_system_dark_mode);
 
 	ClassDB::bind_method(D_METHOD("has_environment", "variable"), &OS::has_environment);
 	ClassDB::bind_method(D_METHOD("get_environment", "variable"), &OS::get_environment);

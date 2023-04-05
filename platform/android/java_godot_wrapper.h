@@ -70,6 +70,7 @@ private:
 	jmethodID _get_class_loader = nullptr;
 	jmethodID _create_new_godot_instance = nullptr;
 	jmethodID _get_render_view = nullptr;
+	jmethodID _get_dark_mode = nullptr;
 
 public:
 	GodotJavaWrapper(JNIEnv *p_env, jobject p_activity, jobject p_godot_instance);

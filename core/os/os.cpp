@@ -155,6 +155,10 @@ int OS::get_process_id() const {
 	return -1;
 }
 
+bool OS::get_system_dark_mode() const {
+	return false;
+}
+
 bool OS::is_stdout_verbose() const {
 	return _verbose_stdout;
 }

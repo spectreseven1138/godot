@@ -2341,6 +2341,10 @@ void GDScriptAnalyzer::update_const_expression_builtin_type(GDScriptParser::Expr
 		return;
 	}
 
+	if (value_type.builtin_type == Variant::NIL) {
+		return;
+	}
+
 #ifdef DEBUG_ENABLED
 	if (p_type.kind == GDScriptParser::DataType::ENUM && value_type.builtin_type == Variant::INT && !enum_has_value(p_type, p_expression->reduced_value)) {
 		parser->push_warning(p_expression, GDScriptWarning::INT_AS_ENUM_WITHOUT_MATCH, p_usage, p_expression->reduced_value.stringify(), p_type.to_string());

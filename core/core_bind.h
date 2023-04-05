@@ -156,6 +156,8 @@ public:
 	bool is_process_running(int p_pid) const;
 	int get_process_id() const;
 
+	bool get_system_dark_mode() const;
+
 	void set_restart_on_exit(bool p_restart, const Vector<String> &p_restart_arguments = Vector<String>());
 	bool is_restart_on_exit_set() const;
 	Vector<String> get_restart_on_exit_arguments() const;

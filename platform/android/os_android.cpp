@@ -333,6 +333,10 @@ String OS_Android::get_model_name() const {
 	return OS_Unix::get_model_name();
 }
 
+bool OS_Android::get_system_dark_mode() const {
+	return godot_java->get_dark_mode();
+}
+
 String OS_Android::get_data_path() const {
 	return get_user_data_dir();
 }
