@@ -965,6 +965,46 @@ void SpriteFramesEditor::_animation_speed_changed(double p_value) {
 	undo_redo->commit_action();
 }
 
+void SpriteFramesEditor::_animation_offset_x_changed(double p_value) {
+	if (updating) {
+		return;
+	}
+
+	EditorUndoRedoManager *undo_redo = EditorUndoRedoManager::get_singleton();
+	undo_redo->create_action(TTR("Change sprite offset X"), UndoRedo::MERGE_DISABLE, EditorNode::get_singleton()->get_edited_scene());
+	undo_redo->add_do_method(frames.ptr(), "set_animation_offset_x", edited_anim, p_value);
+	undo_redo->add_undo_method(frames.ptr(), "set_animation_offset_x", edited_anim, frames->get_animation_offset_x(edited_anim));
+	undo_redo->add_do_method(this, "_update_library", true);
+	undo_redo->add_undo_method(this, "_update_library", true);
+
+	if (animated_sprite) {
+		undo_redo->add_do_method(animated_sprite, "queue_redraw");
+		undo_redo->add_undo_method(animated_sprite, "queue_redraw");
+	}
+
+	undo_redo->commit_action();
+}
+
+void SpriteFramesEditor::_animation_offset_y_changed(double p_value) {
+	if (updating) {
+		return;
+	}
+
+	EditorUndoRedoManager *undo_redo = EditorUndoRedoManager::get_singleton();
+	undo_redo->create_action(TTR("Change sprite offset Y"), UndoRedo::MERGE_DISABLE, EditorNode::get_singleton()->get_edited_scene());
+	undo_redo->add_do_method(frames.ptr(), "set_animation_offset_y", edited_anim, p_value);
+	undo_redo->add_undo_method(frames.ptr(), "set_animation_offset_y", edited_anim, frames->get_animation_offset_y(edited_anim));
+	undo_redo->add_do_method(this, "_update_library", true);
+	undo_redo->add_undo_method(this, "_update_library", true);
+
+	if (animated_sprite) {
+		undo_redo->add_do_method(animated_sprite, "queue_redraw");
+		undo_redo->add_undo_method(animated_sprite, "queue_redraw");
+	}
+
+	undo_redo->commit_action();
+}
+
 void SpriteFramesEditor::_frame_list_gui_input(const Ref<InputEvent> &p_event) {
 	const Ref<InputEventMouseButton> mb = p_event;
 
@@ -1159,6 +1199,8 @@ void SpriteFramesEditor::_update_library(bool p_skip_selector) {
 
 	anim_speed->set_value(frames->get_animation_speed(edited_anim));
 	anim_loop->set_pressed(frames->get_animation_loop(edited_anim));
+	offset_x->set_value(frames->get_animation_offset_x(edited_anim));
+	offset_y->set_value(frames->get_animation_offset_y(edited_anim));
 
 	updating = false;
 }
@@ -1202,6 +1244,8 @@ void SpriteFramesEditor::edit(Ref<SpriteFrames> p_frames) {
 	delete_anim->set_disabled(read_only);
 	anim_speed->set_editable(!read_only);
 	anim_loop->set_disabled(read_only);
+	offset_x->set_read_only(read_only);
+	offset_y->set_read_only(read_only);
 	load->set_disabled(read_only);
 	load_sheet->set_disabled(read_only);
 	copy->set_disabled(read_only);
@@ -1552,6 +1596,43 @@ SpriteFramesEditor::SpriteFramesEditor() {
 	anim_speed->set_tooltip_text(TTR("Animation Speed"));
 	anim_speed->connect("value_changed", callable_mp(this, &SpriteFramesEditor::_animation_speed_changed));
 	hbc_animlist->add_child(anim_speed);
+
+	HBoxContainer *hbc_offsetbar = memnew(HBoxContainer);
+	sub_vb->add_child(hbc_offsetbar);
+
+	Label *offset_label = memnew(Label);
+	offset_label->set_text(TTR("Sprite offset:"));
+	hbc_offsetbar->add_child(offset_label);
+
+
+	HBoxContainer *hb = memnew(HBoxContainer);
+	hb->set_h_size_flags(SIZE_EXPAND_FILL);
+
+	BoxContainer *bc;
+	bc = memnew(HBoxContainer);
+	hb->add_child(bc);
+	bc->set_h_size_flags(SIZE_EXPAND_FILL);
+
+	offset_x = memnew(EditorSpinSlider);
+	offset_x->set_allow_lesser(true);
+	offset_x->set_allow_greater(true);
+	offset_x->set_step(EDITOR_GET("interface/inspector/default_float_step"));
+	offset_x->set_hide_slider(true);
+	offset_x->set_label("X");
+	offset_x->set_h_size_flags(SIZE_EXPAND_FILL);
+	offset_x->connect("value_changed", callable_mp(this, &SpriteFramesEditor::_animation_offset_x_changed));
+	hbc_offsetbar->add_child(offset_x);
+
+	offset_y = memnew(EditorSpinSlider);
+	offset_y->set_allow_lesser(true);
+	offset_y->set_allow_greater(true);
+	offset_y->set_step(EDITOR_GET("interface/inspector/default_float_step"));
+	offset_y->set_hide_slider(true);
+	// offset_y->set_flat(false);
+	offset_y->set_label("Y");
+	offset_y->set_h_size_flags(SIZE_EXPAND_FILL);
+	offset_y->connect("value_changed", callable_mp(this, &SpriteFramesEditor::_animation_offset_y_changed));
+	hbc_offsetbar->add_child(offset_y);
 
 	anim_search_box = memnew(LineEdit);
 	sub_vb->add_child(anim_search_box);

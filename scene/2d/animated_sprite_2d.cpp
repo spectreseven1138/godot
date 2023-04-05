@@ -267,6 +267,9 @@ void AnimatedSprite2D::_notification(int p_what) {
 				ofs -= s / 2;
 			}
 
+			ofs.x += frames->get_animation_offset_x(animation);
+			ofs.y += frames->get_animation_offset_y(animation);
+
 			if (get_viewport() && get_viewport()->is_snap_2d_transforms_to_pixel_enabled()) {
 				ofs = ofs.floor();
 			}

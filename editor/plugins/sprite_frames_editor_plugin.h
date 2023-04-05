@@ -32,6 +32,7 @@
 #define SPRITE_FRAMES_EDITOR_PLUGIN_H
 
 #include "editor/editor_plugin.h"
+#include "editor/editor_spin_slider.h"
 #include "scene/2d/animated_sprite_2d.h"
 #include "scene/3d/sprite_3d.h"
 #include "scene/gui/button.h"
@@ -103,6 +104,9 @@ class SpriteFramesEditor : public HSplitContainer {
 	Button *delete_anim = nullptr;
 	SpinBox *anim_speed = nullptr;
 	Button *anim_loop = nullptr;
+
+	EditorSpinSlider *offset_x = nullptr;
+	EditorSpinSlider *offset_y = nullptr;
 
 	HBoxContainer *autoplay_container = nullptr;
 	Button *autoplay = nullptr;
@@ -179,6 +183,8 @@ class SpriteFramesEditor : public HSplitContainer {
 	void _animation_search_text_changed(const String &p_text);
 	void _animation_loop_changed();
 	void _animation_speed_changed(double p_value);
+	void _animation_offset_x_changed(double p_value);
+	void _animation_offset_y_changed(double p_value);
 
 	void _frame_list_gui_input(const Ref<InputEvent> &p_event);
 	void _frame_list_item_selected(int p_index);

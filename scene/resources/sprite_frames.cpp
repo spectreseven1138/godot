@@ -159,6 +159,30 @@ bool SpriteFrames::get_animation_loop(const StringName &p_anim) const {
 	return E->value.loop;
 }
 
+void SpriteFrames::set_animation_offset_x(const StringName &p_anim, double p_offset) {
+	HashMap<StringName, Anim>::Iterator E = animations.find(p_anim);
+	ERR_FAIL_COND_MSG(!E, "Animation '" + String(p_anim) + "' doesn't exist.");
+	E->value.offset_x = p_offset;
+}
+
+double SpriteFrames::get_animation_offset_x(const StringName &p_anim) const {
+	HashMap<StringName, Anim>::ConstIterator E = animations.find(p_anim);
+	ERR_FAIL_COND_V_MSG(!E, 0, "Animation '" + String(p_anim) + "' doesn't exist.");
+	return E->value.offset_x;
+}
+
+void SpriteFrames::set_animation_offset_y(const StringName &p_anim, double p_offset) {
+	HashMap<StringName, Anim>::Iterator E = animations.find(p_anim);
+	ERR_FAIL_COND_MSG(!E, "Animation '" + String(p_anim) + "' doesn't exist.");
+	E->value.offset_y = p_offset;
+}
+
+double SpriteFrames::get_animation_offset_y(const StringName &p_anim) const {
+	HashMap<StringName, Anim>::ConstIterator E = animations.find(p_anim);
+	ERR_FAIL_COND_V_MSG(!E, 0, "Animation '" + String(p_anim) + "' doesn't exist.");
+	return E->value.offset_y;
+}
+
 Array SpriteFrames::_get_animations() const {
 	Array anims;
 
@@ -172,6 +196,8 @@ Array SpriteFrames::_get_animations() const {
 		d["name"] = anim_name;
 		d["speed"] = anim.speed;
 		d["loop"] = anim.loop;
+		d["offset_x"] = anim.offset_x;
+		d["offset_y"] = anim.offset_y;
 		Array frames;
 		for (int i = 0; i < anim.frames.size(); i++) {
 			Dictionary f;
@@ -199,6 +225,14 @@ void SpriteFrames::_set_animations(const Array &p_animations) {
 		Anim anim;
 		anim.speed = d["speed"];
 		anim.loop = d["loop"];
+
+		if (d.has("offset_x")) {
+			anim.offset_x = d["offset_x"];
+		}
+		if (d.has("offset_y")) {
+			anim.offset_y = d["offset_y"];
+		}
+
 		Array frames = d["frames"];
 		for (int j = 0; j < frames.size(); j++) {
 #ifndef DISABLE_DEPRECATED
@@ -237,6 +271,11 @@ void SpriteFrames::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_animation_loop", "anim", "loop"), &SpriteFrames::set_animation_loop);
 	ClassDB::bind_method(D_METHOD("get_animation_loop", "anim"), &SpriteFrames::get_animation_loop);
+
+	ClassDB::bind_method(D_METHOD("set_animation_offset_x", "anim", "offset"), &SpriteFrames::set_animation_offset_x);
+	ClassDB::bind_method(D_METHOD("get_animation_offset_x", "anim"), &SpriteFrames::get_animation_offset_x);
+	ClassDB::bind_method(D_METHOD("set_animation_offset_y", "anim", "offset"), &SpriteFrames::set_animation_offset_y);
+	ClassDB::bind_method(D_METHOD("get_animation_offset_y", "anim"), &SpriteFrames::get_animation_offset_y);
 
 	ClassDB::bind_method(D_METHOD("add_frame", "anim", "texture", "duration", "at_position"), &SpriteFrames::add_frame, DEFVAL(1.0), DEFVAL(-1));
 	ClassDB::bind_method(D_METHOD("set_frame", "anim", "idx", "texture", "duration"), &SpriteFrames::set_frame, DEFVAL(1.0));
