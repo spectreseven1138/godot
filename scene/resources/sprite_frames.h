@@ -47,8 +47,8 @@ class SpriteFrames : public Resource {
 		double speed = 5.0;
 		bool loop = true;
 		Vector<Frame> frames;
-		double offset_x = 0.0;
-		double offset_y = 0.0;
+		double center_offset_x = 0.0;
+		double center_offset_y = 0.0;
 	};
 
 	HashMap<StringName, Anim> animations;
@@ -74,10 +74,10 @@ public:
 	void set_animation_loop(const StringName &p_anim, bool p_loop);
 	bool get_animation_loop(const StringName &p_anim) const;
 
-	void set_animation_offset_x(const StringName &p_anim, double p_offset);
-	double get_animation_offset_x(const StringName &p_anim) const;
-	void set_animation_offset_y(const StringName &p_anim, double p_offset);
-	double get_animation_offset_y(const StringName &p_anim) const;
+	void set_animation_center_offset_x(const StringName &p_anim, double p_center);
+	double get_animation_center_offset_x(const StringName &p_anim) const;
+	void set_animation_center_offset_y(const StringName &p_anim, double p_center);
+	double get_animation_center_offset_y(const StringName &p_anim) const;
 
 	void add_frame(const StringName &p_anim, const Ref<Texture2D> &p_texture, float p_duration = 1.0, int p_at_pos = -1);
 	void set_frame(const StringName &p_anim, int p_idx, const Ref<Texture2D> &p_texture, float p_duration = 1.0);

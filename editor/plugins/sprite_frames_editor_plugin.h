@@ -105,8 +105,8 @@ class SpriteFramesEditor : public HSplitContainer {
 	SpinBox *anim_speed = nullptr;
 	Button *anim_loop = nullptr;
 
-	EditorSpinSlider *offset_x = nullptr;
-	EditorSpinSlider *offset_y = nullptr;
+	EditorSpinSlider *anim_center_offset_x = nullptr;
+	EditorSpinSlider *anim_center_offset_y = nullptr;
 
 	HBoxContainer *autoplay_container = nullptr;
 	Button *autoplay = nullptr;
@@ -183,8 +183,8 @@ class SpriteFramesEditor : public HSplitContainer {
 	void _animation_search_text_changed(const String &p_text);
 	void _animation_loop_changed();
 	void _animation_speed_changed(double p_value);
-	void _animation_offset_x_changed(double p_value);
-	void _animation_offset_y_changed(double p_value);
+	void _animation_center_offset_x_changed(double p_value);
+	void _animation_center_offset_y_changed(double p_value);
 
 	void _frame_list_gui_input(const Ref<InputEvent> &p_event);
 	void _frame_list_item_selected(int p_index);
