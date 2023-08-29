@@ -992,25 +992,25 @@ uint32_t TileSet::get_navigation_layer_layers(int p_layer_index) const {
 }
 
 void TileSet::set_navigation_layer_layer_value(int p_layer_index, int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Navigation layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_MSG(p_layer_number > 32, "Navigation layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Navigation layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number > 31, "Navigation layer number must be between 0 and 31 inclusive.");
 
 	uint32_t _navigation_layers = get_navigation_layer_layers(p_layer_index);
 
 	if (p_value) {
-		_navigation_layers |= 1 << (p_layer_number - 1);
+		_navigation_layers |= 1 << p_layer_number;
 	} else {
-		_navigation_layers &= ~(1 << (p_layer_number - 1));
+		_navigation_layers &= ~(1 << p_layer_number);
 	}
 
 	set_navigation_layer_layers(p_layer_index, _navigation_layers);
 }
 
 bool TileSet::get_navigation_layer_layer_value(int p_layer_index, int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Navigation layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_V_MSG(p_layer_number > 32, false, "Navigation layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Navigation layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number > 31, false, "Navigation layer number must be between 0 and 31 inclusive.");
 
-	return get_navigation_layer_layers(p_layer_index) & (1 << (p_layer_number - 1));
+	return get_navigation_layer_layers(p_layer_index) & (1 << p_layer_number);
 }
 
 // Custom data.

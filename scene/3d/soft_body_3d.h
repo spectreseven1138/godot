@@ -92,8 +92,8 @@ private:
 	DisableMode disable_mode = DISABLE_MODE_REMOVE;
 
 	RID owned_mesh;
-	uint32_t collision_mask = 1;
-	uint32_t collision_layer = 1;
+	uint32_t collision_mask = 0;
+	uint32_t collision_layer = 0;
 	NodePath parent_collision_ignore;
 	Vector<PinnedPoint> pinned_points;
 	bool simulation_started = false;

@@ -85,21 +85,21 @@ uint32_t VisualInstance3D::get_layer_mask() const {
 }
 
 void VisualInstance3D::set_layer_mask_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Render layer number must be between 1 and 20 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Render layer number must be between 1 and 20 inclusive.");
 	ERR_FAIL_COND_MSG(p_layer_number > 20, "Render layer number must be between 1 and 20 inclusive.");
 	uint32_t mask = get_layer_mask();
 	if (p_value) {
-		mask |= 1 << (p_layer_number - 1);
+		mask |= 1 << p_layer_number;
 	} else {
-		mask &= ~(1 << (p_layer_number - 1));
+		mask &= ~(1 << p_layer_number);
 	}
 	set_layer_mask(mask);
 }
 
 bool VisualInstance3D::get_layer_mask_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Render layer number must be between 1 and 20 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Render layer number must be between 1 and 20 inclusive.");
 	ERR_FAIL_COND_V_MSG(p_layer_number > 20, false, "Render layer number must be between 1 and 20 inclusive.");
-	return layers & (1 << (p_layer_number - 1));
+	return layers & (1 << p_layer_number);
 }
 
 void VisualInstance3D::set_sorting_offset(float p_offset) {

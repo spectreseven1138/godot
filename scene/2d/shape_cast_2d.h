@@ -48,7 +48,7 @@ class ShapeCast2D : public Node2D {
 
 	HashSet<RID> exclude;
 	real_t margin = 0.0;
-	uint32_t collision_mask = 1;
+	uint32_t collision_mask = 0;
 	bool exclude_parent_body = true;
 	bool collide_with_areas = false;
 	bool collide_with_bodies = true;

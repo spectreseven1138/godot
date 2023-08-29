@@ -59,21 +59,21 @@ uint32_t RayCast3D::get_collision_mask() const {
 }
 
 void RayCast3D::set_collision_mask_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_MSG(p_layer_number > 32, "Collision layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number > 31, "Collision layer number must be between 0 and 31 inclusive.");
 	uint32_t mask = get_collision_mask();
 	if (p_value) {
-		mask |= 1 << (p_layer_number - 1);
+		mask |= 1 << p_layer_number;
 	} else {
-		mask &= ~(1 << (p_layer_number - 1));
+		mask &= ~(1 << p_layer_number);
 	}
 	set_collision_mask(mask);
 }
 
 bool RayCast3D::get_collision_mask_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_V_MSG(p_layer_number > 32, false, "Collision layer number must be between 1 and 32 inclusive.");
-	return get_collision_mask() & (1 << (p_layer_number - 1));
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number > 31, false, "Collision layer number must be between 0 and 31 inclusive.");
+	return get_collision_mask() & (1 << p_layer_number);
 }
 
 bool RayCast3D::is_colliding() const {

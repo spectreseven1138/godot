@@ -76,7 +76,7 @@ private:
 	Vector2 gravity = Vector2(0, 6);
 
 	bool use_colliders = false;
-	uint32_t collision_mask = 1;
+	uint32_t collision_mask = 0;
 
 	void jiggle_joint_update_bone2d_cache(int p_joint_idx);
 	void _execute_jiggle_joint(int p_joint_idx, Node2D *p_target, float p_delta);

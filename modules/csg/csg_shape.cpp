@@ -90,39 +90,39 @@ uint32_t CSGShape3D::get_collision_mask() const {
 }
 
 void CSGShape3D::set_collision_layer_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_MSG(p_layer_number > 32, "Collision layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number > 31, "Collision layer number must be between 0 and 31 inclusive.");
 	uint32_t layer = get_collision_layer();
 	if (p_value) {
-		layer |= 1 << (p_layer_number - 1);
+		layer |= 1 << p_layer_number;
 	} else {
-		layer &= ~(1 << (p_layer_number - 1));
+		layer &= ~(1 << p_layer_number);
 	}
 	set_collision_layer(layer);
 }
 
 bool CSGShape3D::get_collision_layer_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_V_MSG(p_layer_number > 32, false, "Collision layer number must be between 1 and 32 inclusive.");
-	return get_collision_layer() & (1 << (p_layer_number - 1));
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number > 31, false, "Collision layer number must be between 0 and 31 inclusive.");
+	return get_collision_layer() & (1 << p_layer_number);
 }
 
 void CSGShape3D::set_collision_mask_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_MSG(p_layer_number > 32, "Collision layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number > 31, "Collision layer number must be between 0 and 31 inclusive.");
 	uint32_t mask = get_collision_mask();
 	if (p_value) {
-		mask |= 1 << (p_layer_number - 1);
+		mask |= 1 << p_layer_number;
 	} else {
-		mask &= ~(1 << (p_layer_number - 1));
+		mask &= ~(1 << p_layer_number);
 	}
 	set_collision_mask(mask);
 }
 
 bool CSGShape3D::get_collision_mask_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Collision layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_V_MSG(p_layer_number > 32, false, "Collision layer number must be between 1 and 32 inclusive.");
-	return get_collision_mask() & (1 << (p_layer_number - 1));
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Collision layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number > 31, false, "Collision layer number must be between 0 and 31 inclusive.");
+	return get_collision_mask() & (1 << p_layer_number);
 }
 
 void CSGShape3D::set_collision_priority(real_t p_priority) {

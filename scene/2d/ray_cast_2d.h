@@ -46,7 +46,7 @@ class RayCast2D : public Node2D {
 	Vector2 collision_point;
 	Vector2 collision_normal;
 	HashSet<RID> exclude;
-	uint32_t collision_mask = 1;
+	uint32_t collision_mask = 0;
 	bool exclude_parent_body = true;
 
 	Vector2 target_position = Vector2(0, 50);

@@ -47,8 +47,8 @@ public:
 	};
 
 private:
-	uint32_t collision_layer = 1;
-	uint32_t collision_mask = 1;
+	uint32_t collision_layer = 0;
+	uint32_t collision_mask = 0;
 	real_t collision_priority = 1.0;
 
 	bool area = false;

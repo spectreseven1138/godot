@@ -620,19 +620,19 @@ uint32_t GPUParticlesCollisionSDF3D::get_bake_mask() const {
 }
 
 void GPUParticlesCollisionSDF3D::set_bake_mask_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1 || p_layer_number > 20, vformat("The render layer number (%d) must be between 1 and 20 (inclusive).", p_layer_number));
+	ERR_FAIL_COND_MSG(p_layer_number < 0 || p_layer_number > 20, vformat("The render layer number (%d) must be between 1 and 20 (inclusive).", p_layer_number));
 	uint32_t mask = get_bake_mask();
 	if (p_value) {
-		mask |= 1 << (p_layer_number - 1);
+		mask |= 1 << p_layer_number;
 	} else {
-		mask &= ~(1 << (p_layer_number - 1));
+		mask &= ~(1 << p_layer_number);
 	}
 	set_bake_mask(mask);
 }
 
 bool GPUParticlesCollisionSDF3D::get_bake_mask_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1 || p_layer_number > 20, false, vformat("The render layer number (%d) must be between 1 and 20 (inclusive).", p_layer_number));
-	return bake_mask & (1 << (p_layer_number - 1));
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0 || p_layer_number > 20, false, vformat("The render layer number (%d) must be between 1 and 20 (inclusive).", p_layer_number));
+	return bake_mask & (1 << p_layer_number);
 }
 
 void GPUParticlesCollisionSDF3D::set_texture(const Ref<Texture3D> &p_texture) {

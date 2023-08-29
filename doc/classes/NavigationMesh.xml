@@ -36,7 +36,7 @@
 			<return type="bool" />
 			<param index="0" name="layer_number" type="int" />
 			<description>
-				Returns whether or not the specified layer of the [member geometry_collision_mask] is enabled, given a [param layer_number] between 1 and 32.
+				Returns whether or not the specified layer of the [member geometry_collision_mask] is enabled, given a [param layer_number] between 0 and 31.
 			</description>
 		</method>
 		<method name="get_polygon">
@@ -63,7 +63,7 @@
 			<param index="0" name="layer_number" type="int" />
 			<param index="1" name="value" type="bool" />
 			<description>
-				Based on [param value], enables or disables the specified layer in the [member geometry_collision_mask], given a [param layer_number] between 1 and 32.
+				Based on [param value], enables or disables the specified layer in the [member geometry_collision_mask], given a [param layer_number] between 0 and 31.
 			</description>
 		</method>
 		<method name="set_vertices">

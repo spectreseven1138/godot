@@ -80,25 +80,25 @@ uint32_t NavigationRegion2D::get_navigation_layers() const {
 }
 
 void NavigationRegion2D::set_navigation_layer_value(int p_layer_number, bool p_value) {
-	ERR_FAIL_COND_MSG(p_layer_number < 1, "Navigation layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_MSG(p_layer_number > 32, "Navigation layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number < 0, "Navigation layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_MSG(p_layer_number > 31, "Navigation layer number must be between 0 and 31 inclusive.");
 
 	uint32_t _navigation_layers = get_navigation_layers();
 
 	if (p_value) {
-		_navigation_layers |= 1 << (p_layer_number - 1);
+		_navigation_layers |= 1 << p_layer_number;
 	} else {
-		_navigation_layers &= ~(1 << (p_layer_number - 1));
+		_navigation_layers &= ~(1 << p_layer_number);
 	}
 
 	set_navigation_layers(_navigation_layers);
 }
 
 bool NavigationRegion2D::get_navigation_layer_value(int p_layer_number) const {
-	ERR_FAIL_COND_V_MSG(p_layer_number < 1, false, "Navigation layer number must be between 1 and 32 inclusive.");
-	ERR_FAIL_COND_V_MSG(p_layer_number > 32, false, "Navigation layer number must be between 1 and 32 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number < 0, false, "Navigation layer number must be between 0 and 31 inclusive.");
+	ERR_FAIL_COND_V_MSG(p_layer_number > 31, false, "Navigation layer number must be between 0 and 31 inclusive.");
 
-	return get_navigation_layers() & (1 << (p_layer_number - 1));
+	return get_navigation_layers() & (1 << p_layer_number);
 }
 
 void NavigationRegion2D::set_enter_cost(real_t p_enter_cost) {

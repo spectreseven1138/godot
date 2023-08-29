@@ -323,8 +323,8 @@ private:
 
 	// Physics
 	struct PhysicsLayer {
-		uint32_t collision_layer = 1;
-		uint32_t collision_mask = 1;
+		uint32_t collision_layer = 0;
+		uint32_t collision_mask = 0;
 		Ref<PhysicsMaterial> physics_material;
 	};
 	Vector<PhysicsLayer> physics_layers;
